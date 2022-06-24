@@ -27,7 +27,7 @@ router.get('/get/items-types', async (req, res) => {
     try {
         const items = await Items.find()
         const count = await Items.find().countDocuments()
-        res.status(200).send({ code: 200, message: msg,totalItems:count, data: items })
+        res.status(200).send({ code: 200, message: msg, totalItems: count, data: items })
     } catch (error) {
         res.status(404).send({ code: 404, message: error.message })
     }
@@ -45,7 +45,7 @@ router.patch('/update/item/:type', async (req, res) => {
         if (!item) {
             throw new Error(`no item found with type: '${type}' `)
         }
-        res.status(200).send({code:200, message: msg })
+        res.status(200).send({ code: 200, message: msg })
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })
     }

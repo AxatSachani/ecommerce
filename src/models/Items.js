@@ -3,11 +3,12 @@ const mongoose = require('mongoose');
 const moment = require('moment')
 
 const ItemSchema = new mongoose.Schema({
+
     item_type: {
         type: String,
         required: true,
         trim: true,
-        uppercase:true
+        uppercase: true
     },
     addedBy: {
         type: ObjectId,

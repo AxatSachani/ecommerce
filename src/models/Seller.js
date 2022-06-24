@@ -1,12 +1,13 @@
-
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 const validator = require('validator')
-const bcrypt = require('bcrypt')
-const { ObjectId } = require('mongodb')
+const bcrypt = require('bcrypt');
+const { ObjectId } = require("mongodb");
 
-
-const AdminSchema = new mongoose.Schema({
-  
+const SellerSchema = new mongoose.Schema({
+    _id: {
+        type: ObjectId,
+        required: true,
+    },
     first_name: {
         type: String,
         required: true,
@@ -14,19 +15,20 @@ const AdminSchema = new mongoose.Schema({
     },
     last_name: {
         type: String,
+        required: true,
         trim: true
     },
     emailId: {
         type: String,
         required: true,
+        trim: true,
+        lowercase: true,
+        unique: true,
         validate(value) {
             if (!validator.isEmail(value)) {
                 throw new Error('Invalid Email..')
             }
-        },
-        trim: true,
-        lowercase: true,
-        unique: true
+        }
     },
     contact_no: {
         type: Number,
@@ -46,37 +48,33 @@ const AdminSchema = new mongoose.Schema({
             }
         }
     }
-
 })
 
-AdminSchema.methods.toJSON = function () {
-    const admin = this
-    const adminData = admin.toObject()
-    delete adminData.password
-    return adminData
+SellerSchema.methods.toJSON = function () {
+    const seller = this
+    const sellerData = seller.toObject()
+    delete sellerData.password
+    return sellerData
 }
 
-AdminSchema.pre('save', async function (next) {
-    const admin = this
-    if (admin.isModified('password')) {
-        admin.password = await bcrypt.hash(admin.password, 12)
+SellerSchema.pre('save', async function (next) {
+    const seller = this
+    if (seller.isModified('password')) {
+        seller.password = await bcrypt.hash(seller.password, 8)
     }
     next()
 })
-
-AdminSchema.statics.findByCredentials = async function (emailId, password) {
-    const admin = await Admin.findOne({ emailId })
-    if (!admin) {
-        throw new Error('Admin not found')
+SellerSchema.statics.findByCredentials = async function (emailId, password) {
+    const seller = await Seller.findOne({ emailId })
+    if (!seller) {
+        throw new Error('seller not found')
     } else {
-        const isMatch = await bcrypt.compare(password, admin.password)
+        const isMatch = await bcrypt.compare(password, seller.password)
         if (!isMatch) {
             throw new Error('Wrong Password')
         }
-        return admin
+        return seller
     }
-
 }
-
-const Admin = new mongoose.model('Admin', AdminSchema)
-module.exports = Admin
+const Seller = mongoose.model('Seller', SellerSchema)
+module.exports = Seller
