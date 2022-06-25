@@ -1,7 +1,8 @@
 const { ObjectId } = require('mongodb')
 const mongoose = require('mongoose')
 
-const CartSchema = new mongoose.Schema({
+
+const WhishlistSchema = new mongoose.Schema({
 
     user_id: {
         type: ObjectId,
@@ -18,19 +19,12 @@ const CartSchema = new mongoose.Schema({
         product_name: {
             type: String
         },
-        product_quantity: {
-            type: Number
-        },
         product_price: {
             type: Number
-        }, 
-        amount: {
-            type: Number
-        }
+        },
     }],
 
 
-
 })
-const Cart = mongoose.model('Cart', CartSchema)
-module.exports = Cart
+const Whishlist = mongoose.model('Whishlist', WhishlistSchema)
+module.exports = Whishlist
