@@ -2,13 +2,18 @@ const express = require("express");
 const res = require("express/lib/response");
 const router = express.Router()
 const User = require('../models/User')
+const { BillingAddress, ShippingAddress } = require('../models/Address')
+
 
 // user Signup
 router.post('/user/signup', async (req, res) => {
     const msg = 'User created'
     try {
         const user = await User(req.body)
+        const addressDetails = { user_id: user._id, address: req.body.address }
         await user.save()
+        await BillingAddress(addressDetails).save()
+        await ShippingAddress(addressDetails).save()
         res.status(201).send({ code: 201, message: msg, data: user })
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })
@@ -40,14 +45,14 @@ router.patch('/update/user/:id', async (req, res) => {
         }
         const id = req.params.id
         const user = await User.findById(id)
-        if(!user){
+        if (!user) {
             throw new Error('User not found')
         }
         update_fields.forEach((update_fields) => {
             user[update_fields] = req.body[update_fields]
         })
         await user.save()
-        res.status(200).send({code:200,message:msg,data:user})
+        res.status(200).send({ code: 200, message: msg, data: user })
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })
     }

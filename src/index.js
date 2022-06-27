@@ -10,6 +10,8 @@ const ProductRouter = require('./routers/ProductRouter')
 const UserRouter = require('./routers/UserRouter')
 const CartRouter = require('./routers/CartRouter')
 const WhishlistRouter = require('./routers/WhishlistRouter')
+const AddressRouter = require('./routers/AddressRouter')
+const OrderRouter = require('./routers/OrderRouter')
 
 
 const app = express()
@@ -25,6 +27,8 @@ app.use(ProductRouter)
 app.use(UserRouter)
 app.use(CartRouter)
 app.use(WhishlistRouter)
+app.use(AddressRouter)
+app.use(OrderRouter)
 
 
 

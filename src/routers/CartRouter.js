@@ -90,7 +90,7 @@ router.delete('/delete/cart-product', async (req, res) => {
     const msg = 'Cart updated'
     try {
         const cart = await Cart.findById(cart_id)
-        cart.products.splice(cart.products[product_number], 1)
+        cart.products.splice(product_number, 1)
         await cart.save()
         res.status(200).send({ code: 200, message: msg, data: cart })
     } catch (error) {

@@ -69,7 +69,6 @@ router.post('/request/action/:sellerId', async (req, res) => {
 
         } else {
             const seller = await Seller(sellerDetails)
-            console.log(seller);
             await seller.save()
             await SellerRequest.findByIdAndDelete(_id)
             res.status(201).send({ code: 201, message: approvMsg, data: seller })

@@ -18,12 +18,15 @@ const AddProductSchema = new mongoose.Schema({
             required: true
         },
     },
-    size_quantity: [{
+    size: [{
         type: Object,
         size: {
             type: String
         },
     }],
+    quantity:{
+        type:Number
+    },
     product_price: {
         type: Number,
         required: true
