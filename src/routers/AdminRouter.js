@@ -12,7 +12,8 @@ router.post('/admin/signup', async (req, res) => {
     const msg = 'Admin created'
     try {
         const admin = await Admin(req.body).save()
-        res.status(201).send({ code: 201, message: msg, data: admin })
+        const token = await admin.generateAuthToken()
+        res.status(201).send({ code: 201, message: msg, data: admin,token })
     } catch (error) {
         res.status(400).send({ code: 400, message: error })
     }
@@ -25,7 +26,8 @@ router.get('/admin/signin', async (req, res) => {
     const msg = 'Admin signin successfully'
     try {
         const admin = await Admin.findByCredentials(emailId, password)
-        res.status(200).send({ code: 200, message: msg, data: admin })
+        const token = await admin.generateAuthToken()
+        res.status(200).send({ code: 200, message: msg, data: admin,token })
     } catch (error) {
         res.status(404).send({ code: 404, message: error.message })
     }
@@ -46,32 +48,30 @@ router.get('/get/account/request', async (req, res) => {
 //approve or reject 
 router.post('/request/action/:sellerId', async (req, res) => {
     const _id = req.params.sellerId
+    const action = req.body.action
     const approvMsg = 'new seller created. sent email to seller that confirm your seller account and change your password and continue with your seller account '
     const rejectMsg = 'reject seller account request\nsent email to seller with rejection reason'
     try {
         const sellerRequest = await SellerRequest.findById(_id)
-        console.log(sellerRequest);
 
-        const action = req.body.action
         const first_name = sellerRequest.first_name
         const last_name = sellerRequest.last_name
         const emailId = sellerRequest.emailId
         const contact_no = sellerRequest.contact_no
         const password = sellerRequest.password
         const sellerDetails = { _id, first_name, last_name, emailId, contact_no, password }
-        console.log(sellerRequest);
         if (action !== 'approved') {
             const reject_reason = req.body.reject_reason
             const sellerRejected = await SellerRejected(sellerDetails, reject_reason).save()
             await SellerRequest.findByIdAndDelete(_id)
-            console.log(sellerDetails);
             res.status(200).send({ code: 200, message: rejectMsg, data: sellerRejected })
 
         } else {
             const seller = await Seller(sellerDetails)
+            const token = await seller.generateAuthToken()
             await seller.save()
             await SellerRequest.findByIdAndDelete(_id)
-            res.status(201).send({ code: 201, message: approvMsg, data: seller })
+            res.status(201).send({ code: 201, message: approvMsg, data: seller,token })
         }
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })

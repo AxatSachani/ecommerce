@@ -2,31 +2,33 @@ const express = require("express");
 const { ShippingAddress } = require("../models/Address");
 const Cart = require("../models/Cart");
 const Order = require("../models/Order");
+const OrderHistory = require("../models/OrderHistory");
 const Product = require("../models/Product");
 const User = require("../models/User");
+const Invoice = require("../models/Invoice");
 const router = express.Router()
 
 // place order
 router.post('/order', async (req, res) => {
     const user_id = req.body.user_id
     const cart_id = req.body.cart_id
-    var status, total_amount = 0
+    const msg = 'Order Placed'
+    var code = process.env.OFFER20OFF
+    var total_amount = 0, status = 'Miss/Mrs.', user_name, couponCode, dicount, payable_amount, requireAmount
     try {
 
         // user details
         const user = await User.findById(user_id)
         if (user.gender == 'male') {
             status = 'Mr.'
-        } else {
-            status = 'Miss/Mrs.'
         }
-        const user_name = `${status} ${user.first_name} ${user.last_name}`
-        const user_emialId = user.emailId
+        user_name = ` ${user.first_name} ${user.last_name}`
+        const user_emailId = user.emailId
         const user_contact = user.contact_no
         const billAddress = user.address
 
+        //address
         const user_shippAddress = await ShippingAddress.findOne({ user_id })
-        console.log(user_shippAddress);
         const shippAddress = user_shippAddress.address
 
         // products data
@@ -34,6 +36,24 @@ router.post('/order', async (req, res) => {
         for (var i = 0; i < cart.products.length; i++) {
             total_amount += cart.products[i].amount
         }
+        payable_amount = total_amount
+
+        // checkl for code
+        couponCode = req.body.code
+        if (couponCode) {
+            if (code.indexOf(couponCode.toUpperCase()) !== -1) {
+                if (10000 < total_amount) {
+                    dicount = (total_amount * 20) / 100
+                    payable_amount = total_amount - dicount
+                } else {
+                    requireAmount = 10000 - total_amount
+                    throw new Error(`Amount atleast 10000 for code: ${couponCode}, Required ${requireAmount} more for this offer`)
+                }
+            } else {
+                throw new Error(`Invalid coupon code`)
+            }
+        }
+
 
         // check stock
         for (var i = 0; i < cart.products.length; i++) {
@@ -47,14 +67,85 @@ router.post('/order', async (req, res) => {
             }
         }
 
-
         const products = cart.products
-        const OrderDetails = { user_id, user_name, user_emialId, user_contact, products, total_amount, billAddress, shippAddress }
-        console.log(OrderDetails);
+        const OrderDetails = { user_id, user_name, user_emailId, user_contact, products, total_amount, couponCode, dicount, payable_amount, billAddress, shippAddress }
 
+        // save order
         const order = await Order(OrderDetails)
+        await order.save()
+
+        // increase quantity from products data
+        for (var i = 0; i < cart.products.length; i++) {
+            const cart_quantity = cart.products[i].product_quantity
+            const product = await Product.findById(cart.products[i].product_id)
+            product.quantity -= cart_quantity
+            await product.save()
+        }
+
+        //delete cart
+        await Cart.findByIdAndDelete(cart_id)
+
+        // save in history data
+        var order_id = order._id
+        const OrderHistoryDetails = { order_id, user_id, user_name, user_emailId, user_contact, products, total_amount, couponCode, dicount, payable_amount, billAddress, shippAddress }
+        await OrderHistory(OrderHistoryDetails).save()
+
+
+        res.status(201).send({ code: 201, message: msg, data: order })
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })
+    }
+})
+
+
+
+// generate invoice
+router.post('/order/invoice/:id', async (req, res) => {
+    const msg = 'Invoice generate'
+    const order_id = req.params.id
+    var status = 'Mr.'
+    try {
+
+        // order data
+        const orderData = await Order.findById(order_id)
+        const user_id = orderData.user_id
+        var user_name = orderData.user_name
+        const user_emailId = orderData.user_emailId
+        const user_contact = orderData.user_contact
+        const total_amount = orderData.total_amount
+        const dicount = orderData.dicount
+        const payable_amount = orderData.payable_amount
+        const billAddress = orderData.billAddress
+        const shippAddress = orderData.shippAddress
+
+        const user = await User.findById(user_id)
+        if (user.gender == 'female') {
+            status = 'Miss/Mrs.'
+        }
+
+        // product data
+        var productDetails = []
+        user_name = `${status}${user_name}`
+        for (var i = 0; i < orderData.products.length; i++) {
+            const product = await orderData.products[i]
+            const product_name = product.product_name
+            const product_quantity = product.product_quantity
+            const product_price = product.product_price
+            const amount = product.amount
+            const data = { product_name, product_quantity, product_price, amount }
+            productDetails.push(data)
+        }
+
+        const InvoiceDetails = { order_id, user_name, user_emailId, user_contact, products: productDetails, total_amount, dicount, payable_amount, billAddress, shippAddress }
+        if (orderData.payment == 'success') {
+            var invoice = await Invoice(InvoiceDetails)
+            await invoice.save()
+        } else {
+            throw new Error('Payment not succesed')
+        }
+        res.status(201).send({ code: 201, message: msg, data: invoice })
+    } catch (error) {
+        res.status(404).send({ code: 404, message: error.message })
     }
 })
 

@@ -1,4 +1,5 @@
 const express = require('express')
+const fileUpload = require('express-fileupload');
 require('dotenv').config()
 require('./database/database')
 const AdminRoter = require('./routers/AdminRouter')
@@ -12,10 +13,13 @@ const CartRouter = require('./routers/CartRouter')
 const WhishlistRouter = require('./routers/WhishlistRouter')
 const AddressRouter = require('./routers/AddressRouter')
 const OrderRouter = require('./routers/OrderRouter')
-
+const PaymentRouter = require('./routers/PaymentRouter')
+const ForgetPasswordRouter = require('./routers/ForgetPasswordRouter')
+const Photo = require('./routers/Photo')
 
 const app = express()
 app.use(express.json())
+app.use(fileUpload());
 const port = process.env.PORT
 
 app.use(AdminRoter)
@@ -29,6 +33,9 @@ app.use(CartRouter)
 app.use(WhishlistRouter)
 app.use(AddressRouter)
 app.use(OrderRouter)
+app.use(PaymentRouter)
+app.use(ForgetPasswordRouter)
+app.use(Photo)
 
 
 

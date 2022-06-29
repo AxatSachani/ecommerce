@@ -1,9 +1,11 @@
 const { ObjectId } = require("mongodb");
-const { default: mongoose, now } = require("mongoose");
+const { default: mongoose } = require("mongoose");
 const moment = require('moment')
 
-const OrderSchema = new mongoose.Schema({
-
+const OrderHistorySchema = new mongoose.Schema({
+    order_id: {
+        type: ObjectId
+    },
     user_id: {
         type: ObjectId
     },
@@ -40,14 +42,14 @@ const OrderSchema = new mongoose.Schema({
     total_amount: {
         type: Number
     },
-    coupon_code:{
-        type:String
+    coupon_code: {
+        type: String
     },
-    dicount:{
-        type:Number
+    dicount: {
+        type: Number
     },
-    payable_amount:{
-        type:Number
+    payable_amount: {
+        type: Number
     },
     billAddress: {
         type: String
@@ -55,16 +57,16 @@ const OrderSchema = new mongoose.Schema({
     shippAddress: {
         type: String
     },
-    order_time:{
-        type:String,
-        default:moment(Date.now()).format('DD/MM/YYYY hh:mm A')
+    order_time: {
+        type: String,
+        default: moment(Date.now()).format('DD/MM/YYYY hh:mm A')
     },
-    payment:{
-        type:String,
-        default:'pending '
+    payment: {
+        type: String,
+        default: 'pending '
     }
 
 })
 
-const Order = mongoose.model('Order', OrderSchema)
-module.exports = Order
+const OrderHistory = mongoose.model('OrderHistory', OrderHistorySchema)
+module.exports = OrderHistory

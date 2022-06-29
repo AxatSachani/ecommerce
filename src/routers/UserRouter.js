@@ -1,5 +1,4 @@
 const express = require("express");
-const res = require("express/lib/response");
 const router = express.Router()
 const User = require('../models/User')
 const { BillingAddress, ShippingAddress } = require('../models/Address')
@@ -10,11 +9,12 @@ router.post('/user/signup', async (req, res) => {
     const msg = 'User created'
     try {
         const user = await User(req.body)
+        const token = await user.generateAuthToken()
         const addressDetails = { user_id: user._id, address: req.body.address }
         await user.save()
         await BillingAddress(addressDetails).save()
         await ShippingAddress(addressDetails).save()
-        res.status(201).send({ code: 201, message: msg, data: user })
+        res.status(201).send({ code: 201, message: msg, data: user ,token})
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })
     }
@@ -25,7 +25,8 @@ router.get('/user/signin', async (req, res) => {
     const msg = 'user signin'
     try {
         const user = await User.findByCredentials(req.body.emailId, req.body.password)
-        res.status(200).send({ code: 200, message: msg, data: user })
+        const token = await user.generateAuthToken()
+        res.status(200).send({ code: 200, message: msg, data: user,token })
 
     } catch (error) {
         res.status(404).send({ code: 404, message: error.message })

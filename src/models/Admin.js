@@ -2,11 +2,11 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcrypt')
-const { ObjectId } = require('mongodb')
+const jwt = require('jsonwebtoken')
 
 
 const AdminSchema = new mongoose.Schema({
-  
+
     first_name: {
         type: String,
         required: true,
@@ -45,17 +45,25 @@ const AdminSchema = new mongoose.Schema({
                 throw new Error(`Password can not end with space (' ') `)
             }
         }
-    }
+    },
+    tokens: [{
+        token: {
+            type: String
+        }
+    }]
 
 })
 
+// filter response data
 AdminSchema.methods.toJSON = function () {
     const admin = this
     const adminData = admin.toObject()
     delete adminData.password
+    delete adminData.tokens
     return adminData
 }
 
+// change password into bcrypt
 AdminSchema.pre('save', async function (next) {
     const admin = this
     if (admin.isModified('password')) {
@@ -64,6 +72,8 @@ AdminSchema.pre('save', async function (next) {
     next()
 })
 
+
+// login data check
 AdminSchema.statics.findByCredentials = async function (emailId, password) {
     const admin = await Admin.findOne({ emailId })
     if (!admin) {
@@ -75,7 +85,15 @@ AdminSchema.statics.findByCredentials = async function (emailId, password) {
         }
         return admin
     }
+}
 
+// generate token
+AdminSchema.methods.generateAuthToken = async function () {
+    const admin = this
+    const token = jwt.sign({ _id: admin._id.toString() }, 'Token')
+    admin.tokens = admin.tokens.concat({ token })
+    await admin.save()
+    return token
 }
 
 const Admin = new mongoose.model('Admin', AdminSchema)

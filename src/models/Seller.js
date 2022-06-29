@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const validator = require('validator')
 const bcrypt = require('bcrypt');
 const { ObjectId } = require("mongodb");
+const jwt = require('jsonwebtoken')
 
 const SellerSchema = new mongoose.Schema({
     _id: {
@@ -47,9 +48,16 @@ const SellerSchema = new mongoose.Schema({
                 throw new Error(`Password can not end with space (' ') `)
             }
         }
-    }
+    },
+    tokens: [{
+        token: {
+            type: Buffer
+        }
+    }]
 })
 
+
+// filter response data
 SellerSchema.methods.toJSON = function () {
     const seller = this
     const sellerData = seller.toObject()
@@ -57,6 +65,8 @@ SellerSchema.methods.toJSON = function () {
     return sellerData
 }
 
+
+// change password into bcrypt
 SellerSchema.pre('save', async function (next) {
     const seller = this
     if (seller.isModified('password')) {
@@ -64,6 +74,8 @@ SellerSchema.pre('save', async function (next) {
     }
     next()
 })
+
+// check login data
 SellerSchema.statics.findByCredentials = async function (emailId, password) {
     const seller = await Seller.findOne({ emailId })
     if (!seller) {
@@ -76,5 +88,16 @@ SellerSchema.statics.findByCredentials = async function (emailId, password) {
         return seller
     }
 }
+
+// generate token
+SellerSchema.methods.generateAuthToken = async function () {
+    const seller = this
+    const token = jwt.sign({ _id: seller._id.toString() }, 'tokens')
+    seller.tokens = seller.tokens.concat({ token })
+    await seller.save()
+    return token
+}
+
+
 const Seller = mongoose.model('Seller', SellerSchema)
 module.exports = Seller

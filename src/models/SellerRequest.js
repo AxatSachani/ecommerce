@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const { ObjectId } = require("mongodb");
 
 const SellerRequestSchema = new mongoose.Schema({
-    
+
     first_name: {
         type: String,
         required: true,
@@ -44,6 +44,9 @@ const SellerRequestSchema = new mongoose.Schema({
                 throw new Error(`Password can not end with space (' ') `)
             }
         }
+    },
+    document: {
+        type: Array
     }
 })
 

@@ -2,9 +2,9 @@ const { ObjectId } = require("mongodb");
 const { default: mongoose, now } = require("mongoose");
 const moment = require('moment')
 
-const OrderSchema = new mongoose.Schema({
+const InvoiceSchema = new mongoose.Schema({
 
-    user_id: {
+    order_id: {
         type: ObjectId
     },
     user_name: {
@@ -17,13 +17,6 @@ const OrderSchema = new mongoose.Schema({
         type: Number
     },
     products: [{
-        product_id: {
-            type: ObjectId,
-            required: true
-        },
-        seller_id: {
-            type: ObjectId
-        },
         product_name: {
             type: String
         },
@@ -40,14 +33,11 @@ const OrderSchema = new mongoose.Schema({
     total_amount: {
         type: Number
     },
-    coupon_code:{
-        type:String
+    dicount: {
+        type: Number
     },
-    dicount:{
-        type:Number
-    },
-    payable_amount:{
-        type:Number
+    payable_amount: {
+        type: Number
     },
     billAddress: {
         type: String
@@ -55,16 +45,12 @@ const OrderSchema = new mongoose.Schema({
     shippAddress: {
         type: String
     },
-    order_time:{
-        type:String,
-        default:moment(Date.now()).format('DD/MM/YYYY hh:mm A')
-    },
-    payment:{
-        type:String,
-        default:'pending '
+    order_time: {
+        type: String,
+        default: moment(Date.now()).format('DD/MM/YYYY hh:mm A')
     }
 
 })
 
-const Order = mongoose.model('Order', OrderSchema)
-module.exports = Order
+const Invoice = mongoose.model('Invoice', InvoiceSchema)
+module.exports = Invoice

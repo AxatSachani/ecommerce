@@ -14,7 +14,7 @@ const ForgetPassSchema = new mongoose.Schema({
             }
         }
     },
-    seller_id: {
+    id: {
         type: ObjectId,
     },
     otp:{

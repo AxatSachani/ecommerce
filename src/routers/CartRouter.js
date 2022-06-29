@@ -39,6 +39,7 @@ router.post('/add/cart', async (req, res) => {
 
 // update cart quantity-increase
 router.patch('/update/cart/quantity-increase', async (req, res) => {
+    const msg = 'Cart updated'
     try {
         const cart_id = req.body.cart_id
         const productCart_id = req.body.productCart_id
@@ -52,7 +53,7 @@ router.patch('/update/cart/quantity-increase', async (req, res) => {
             }
         }
         await cart.save()
-        res.send(cart)
+        res.status(200).send({ code: 200, message: msg, data: cart })
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })
     }

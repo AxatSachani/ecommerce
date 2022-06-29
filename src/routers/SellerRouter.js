@@ -1,23 +1,47 @@
 const express = require("express");
-
+const multer = require('multer');
 const Seller = require("../models/Seller");
+const Photo = require("../models/Photo");
 const router = express.Router()
 const SellerRequest = require('../models/SellerRequest')
 const ForgetPassword = require('../models/ForgetPass');
-const res = require("express/lib/response");
 
 
 // seller signup (create seller account)
-router.post('/request/account', async (req, res) => {
+const upload = multer({
+    limits: {
+        fileSize: 8000000
+    },
+    fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(png|jpeg|jpg|pdf)$/)) {
+            return cb(new Error('InCorrect file format'))
+        }
+        cb(undefined, true)
+    }
+})
+
+router.post('/request/account', upload.array('document', 12), async (req, res) => {
     const msg = 'new request create for seller account'
+    // const document = req.files
+    // console.log(document);
+    // const first_name = req.body.first_name
+    // const last_name = req.body.last_name
+    // const emailId = req.body.emailId
+    // const contact_no = req.body.contact_no
+    // const password = req.body.password
+    // const data = { first_name, last_name, emailId, contact_no, password, document }
+    // console.log(data);
     try {
-        const sellerRequest = await SellerRequest(req.body)
+        const sellerRequest = await SellerRequest(res.body)
         await sellerRequest.save()
         res.status(201).send({ code: 201, message: msg, data: sellerRequest })
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })
     }
 })
+
+// const multer = require('multer');
+// const res = require('express/lib/response');
 
 
 // signin with seller ID
@@ -48,74 +72,17 @@ router.patch('/update/seller/:id', async (req, res) => {
         if (!seller) {
             throw new Error(`not found.`)
         }
-        update_field.forEach((update_field)=>{
+        update_field.forEach((update_field) => {
             seller[update_field] = req.body[update_field]
         })
         await seller.save()
-        res.status(200).send({code:200,message:msg,data:seller})
+        res.status(200).send({ code: 200, message: msg, data: seller })
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })
     }
 })
 
 
-
-
-// forget password
-router.post('/generateOTP', async (req, res) => {
-    const emailId = req.body.emailId
-    try {
-        const seller = await Seller.findOne({ emailId })
-        if (!seller) {
-            throw new Error('Seller not found')
-        }
-        const seller_id = seller._id
-        const otp = Math.floor(Math.random() * (9989 - 1211 + 1)) + 1211
-        const regenerate = await ForgetPassword.findOne({ emailId })
-        if (regenerate) {
-            const time = Date.now()
-            await ForgetPassword.findOneAndUpdate({ emailId }, { otp, time })
-        } if (!regenerate) {
-            await ForgetPassword({ emailId, seller_id, otp }).save()
-        }
-        res.send({ message: 'OTP sent' })
-    } catch (error) {
-        res.send({ message: error.message })
-    }
-})
-
-router.post('/forget', async (req, res) => {
-    const emailId = req.body.emailId
-    const otp = req.body.otp
-    const password = req.body.password
-    try {
-        const seller = await Seller.findOne({ emailId })
-        if (!seller) {
-            throw new Error('Seller not found')
-        }
-        const details = await ForgetPassword.findOne({ emailId })
-        if (!details) {
-            throw new Error('Invalid emailid')
-        }
-        const validOTP = details.otp
-        const validTime = details.time + 120000 // 3800 + 120 = 3920
-        const currentTime = Date.now()     // 3900 3921 cTime>vTime
-        if (otp == validOTP && currentTime < validTime) {
-            seller.password = password
-            await seller.save()
-            await ForgetPassword.findOneAndDelete({ emailId })
-        }
-        if (otp != validOTP) {
-            throw new Error('Invalid OTP')
-        }
-        if (currentTime > validTime) {
-            throw new Error('Time Out')
-        }
-        res.send({ message: 'Password changed.' })
-    } catch (error) {
-        res.send({ message: error.message })
-    }
-})
 
 
 

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 const UserSchema = new mongoose.Schema({
 
@@ -55,16 +56,26 @@ const UserSchema = new mongoose.Schema({
                 throw new Error(`Password can not end with space (' ') `)
             }
         }
-    }
+    },
+    tokens: [{
+        token: {
+            type: String
+        }
+    }]
 })
 
+
+// filter response data
 UserSchema.methods.toJSON = function () {
     const user = this
     const userData = user.toObject()
     delete userData.password
+    delete userData.tokens
     return userData
 }
 
+
+// convert plain password to bcrypt
 UserSchema.pre('save', async function (next) {
     const user = this
     if (user.isModified('password')) {
@@ -73,16 +84,27 @@ UserSchema.pre('save', async function (next) {
     next()
 })
 
+
+// check login data
 UserSchema.statics.findByCredentials = async function (emailId, password) {
-    const user = await User.findOne({emailId})
-    if(!user){
+    const user = await User.findOne({ emailId })
+    if (!user) {
         throw new Error('User not found')
     }
-    const isMatch = await bcrypt.compare(password,user.password)
-    if(!isMatch){
+    const isMatch = await bcrypt.compare(password, user.password)
+    if (!isMatch) {
         throw new Error('Invalid Password')
     }
     return user
+}
+
+// generate token
+UserSchema.methods.generateAuthToken = async function(){
+    const user = this
+    const token = jwt.sign({_id:user._id.toString()},'token')
+    user.tokens = user.tokens.concat({token})
+    await user.save()
+    return token
 }
 
 const User = mongoose.model('User', UserSchema)
