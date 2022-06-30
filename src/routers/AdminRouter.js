@@ -1,5 +1,6 @@
 const express = require("express");
 const res = require("express/lib/response");
+const auth = require("../middleware/Auth");
 const router = express.Router()
 const Admin = require('../models/Admin');
 const Seller = require("../models/Seller");
@@ -13,7 +14,9 @@ router.post('/admin/signup', async (req, res) => {
     try {
         const admin = await Admin(req.body).save()
         const token = await admin.generateAuthToken()
-        res.status(201).send({ code: 201, message: msg, data: admin,token })
+        res.set('Content-Type', 'token')
+        // res.token = token
+        res.status(201).send({ code: 201, message: msg, data: admin, token })
     } catch (error) {
         res.status(400).send({ code: 400, message: error })
     }
@@ -27,19 +30,31 @@ router.get('/admin/signin', async (req, res) => {
     try {
         const admin = await Admin.findByCredentials(emailId, password)
         const token = await admin.generateAuthToken()
-        res.status(200).send({ code: 200, message: msg, data: admin,token })
+        res.status(200).send({ code: 200, message: msg, data: admin, token })
     } catch (error) {
         res.status(404).send({ code: 404, message: error.message })
     }
 })
 
 // get seller account create request
-router.get('/get/account/request', async (req, res) => {
+router.get('/get/account/request', auth,async (req, res) => {
     const msg = 'all request for new seller account'
     try {
         const sellerRequest = await SellerRequest.find({})
         const count = await SellerRequest.find({}).countDocuments()
         res.status(200).send({ code: 200, message: msg, totalRequest: count, data: sellerRequest })
+    } catch (error) {
+        res.status(404).send({ code: 404, message: error.message })
+    }
+})
+
+// get rejected seller account details
+router.get('/get/seller/reject', async (req, res) => {
+    const msg = 'all rejected seller account'
+    try {
+        const sellerRejected = await SellerRejected.find({})
+        const count = await SellerRejected.find({}).countDocuments()
+        res.status(200).send({ code: 200, message: msg, totalRequest: count, data: sellerRejected })
     } catch (error) {
         res.status(404).send({ code: 404, message: error.message })
     }
@@ -71,7 +86,7 @@ router.post('/request/action/:sellerId', async (req, res) => {
             const token = await seller.generateAuthToken()
             await seller.save()
             await SellerRequest.findByIdAndDelete(_id)
-            res.status(201).send({ code: 201, message: approvMsg, data: seller,token })
+            res.status(201).send({ code: 201, message: approvMsg, data: seller, token })
         }
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })

@@ -41,9 +41,9 @@ router.post('/add/cart', async (req, res) => {
 router.patch('/update/cart/quantity-increase', async (req, res) => {
     const msg = 'Cart updated'
     try {
-        const cart_id = req.body.cart_id
+        const user_id = req.body.user_id
         const productCart_id = req.body.productCart_id
-        var cart = await Cart.findById(cart_id)
+        var cart = await Cart.findOne({ user_id })
         for (var i = 0; i < cart.products.length; i++) {
             const product = cart.products[i]._id == productCart_id
             if (product) {
@@ -64,9 +64,9 @@ router.patch('/update/cart/quantity-increase', async (req, res) => {
 router.patch('/update/cart/quantity-decrease', async (req, res) => {
     const msg = 'Cart updated'
     try {
-        const cart_id = req.body.cart_id
+        const user_id = req.body.user_id
         const productCart_id = req.body.productCart_id
-        var cart = await Cart.findById(cart_id)
+        var cart = await Cart.findOne({ user_id })
         for (var i = 0; i < cart.products.length; i++) {
             const product = cart.products[i]._id == productCart_id
             if (product) {
@@ -83,14 +83,13 @@ router.patch('/update/cart/quantity-decrease', async (req, res) => {
 })
 
 
-
 // delete product from cart
 router.delete('/delete/cart-product', async (req, res) => {
-    const cart_id = req.body.cart_id
+    const user_id = req.body.user_id
     const product_number = req.body.product_number
     const msg = 'Cart updated'
     try {
-        const cart = await Cart.findById(cart_id)
+        const cart = await Cart.findOne({ user_id })
         cart.products.splice(product_number, 1)
         await cart.save()
         res.status(200).send({ code: 200, message: msg, data: cart })
@@ -116,26 +115,12 @@ router.delete('/delete/cart', async (req, res) => {
 })
 
 // get cartDetails by user 
-router.get('/get/user-cart', async (req, res) => {
+router.get('/get/user-cart/:id', async (req, res) => {
     const msg = 'User Cart'
+    const user_id = req.params.id
     try {
-        const userCart = await User.aggregate([
-            {
-                $project: {
-                    _id: 1
-                }
-            },
-            {
-                $lookup: {
-                    from: Cart.collection.name,
-                    localField: '_id',
-                    foreignField: 'user_id',
-                    as: 'CartDetails'
-                },
-            },
-        ])
-        const c = userCart[0].CartDetails[0].products.length
-        res.status(200).send({ code: 200, message: msg, data: userCart })
+        const userCart = await Cart.findOne({ user_id }).select({ user_id: 0 })
+        res.status(200).send({ code: 200, message: msg, data: { user_id, userCart } })
     } catch (error) {
         res.status(404).send({ code: 404, message: error.message })
     }

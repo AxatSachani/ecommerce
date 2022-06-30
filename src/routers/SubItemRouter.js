@@ -53,7 +53,7 @@ router.patch('/update/subitem/:item/:type', async (req, res) => {
 })
 
 // delete subitems
-router.delete('/delete/:item/:type', async (req, res) => {
+router.delete('/delete/subitem/:item/:type', async (req, res) => {
     const item_type = req.params.item.toUpperCase()
     const subItem_type = req.params.type.toUpperCase()
     const msg = 'subItem deleted'

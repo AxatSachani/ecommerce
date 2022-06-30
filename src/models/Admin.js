@@ -90,11 +90,11 @@ AdminSchema.statics.findByCredentials = async function (emailId, password) {
 // generate token
 AdminSchema.methods.generateAuthToken = async function () {
     const admin = this
-    const token = jwt.sign({ _id: admin._id.toString() }, 'Token')
+    const token = jwt.sign({ _id: admin._id.toString() }, 'token')
     admin.tokens = admin.tokens.concat({ token })
     await admin.save()
     return token
 }
 
-const Admin = new mongoose.model('Admin', AdminSchema)
+const Admin = mongoose.model('Admin', AdminSchema)
 module.exports = Admin

@@ -92,7 +92,7 @@ SellerSchema.statics.findByCredentials = async function (emailId, password) {
 // generate token
 SellerSchema.methods.generateAuthToken = async function () {
     const seller = this
-    const token = jwt.sign({ _id: seller._id.toString() }, 'tokens')
+    const token = jwt.sign({ _id: seller._id.toString() }, 'token')
     seller.tokens = seller.tokens.concat({ token })
     await seller.save()
     return token
