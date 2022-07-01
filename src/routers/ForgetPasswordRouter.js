@@ -4,19 +4,19 @@ const Seller = require("../models/Seller");
 const User = require("../models/User");
 const router = express.Router()
 const ForgetPassword = require('../models/ForgetPass');
+const auth = require("../middleware/Auth");
 
 
 // forget seller password
-router.post('/seller/generateOTP', async (req, res) => {
+router.post('/seller/generateOTP', auth,async (req, res) => {
     const emailId = req.body.emailId
-    var id
     try {
         const seller = await Seller.findOne({ emailId })
         if (!seller) {
             throw new Error('Seller not found')
         }
-        id = seller._id
-        const otp = Math.floor(Math.random() * (9989 - 1211 + 1)) + 1211
+        const id = seller._id
+        const otp = Math.floor(Math.random() * (9989 - 1211 + 1)) + 1211 //0.212154 * 8779
         const regenerate = await ForgetPassword.findOne({ emailId })
         if (regenerate) {
             const time = Date.now()
@@ -27,14 +27,14 @@ router.post('/seller/generateOTP', async (req, res) => {
         setTimeout(async () => {
             await ForgetPassword.findOneAndDelete({ emailId })
             console.log('delete');
-        }, 10000);
+        }, 120000);
         res.send({ message: 'OTP sent' })
     } catch (error) {
         res.send({ message: error.message })
     }
 })
 
-router.post('/seller/forget/password', async (req, res) => {
+router.post('/seller/forget/password',auth, async (req, res) => {
     const emailId = req.body.emailId
     const otp = req.body.otp
     const password = req.body.password
@@ -67,7 +67,7 @@ router.post('/seller/forget/password', async (req, res) => {
 
 
 // forget user password
-router.post('/user/generateOTP', async (req, res) => {
+router.post('/user/generateOTP', auth,async (req, res) => {
     const emailId = req.body.emailId
     var id
     try {
@@ -86,14 +86,14 @@ router.post('/user/generateOTP', async (req, res) => {
         }
         setTimeout(async () => {
             await ForgetPassword.findOneAndDelete({ emailId })
-        }, 10000);
+        }, 120000);
         res.send({ message: 'OTP sent' })
     } catch (error) {
         res.send({ message: error.message })
     }
 })
 
-router.post('/user/forget/password', async (req, res) => {
+router.post('/user/forget/password',auth, async (req, res) => {
     const emailId = req.body.emailId
     const otp = req.body.otp
     const password = req.body.password

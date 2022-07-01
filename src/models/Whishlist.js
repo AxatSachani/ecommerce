@@ -8,7 +8,7 @@ const WhishlistSchema = new mongoose.Schema({
         type: ObjectId,
         required: true
     },
-    products: [{
+    products: {
         product_id: {
             type: ObjectId,
             required: true
@@ -22,7 +22,7 @@ const WhishlistSchema = new mongoose.Schema({
         product_price: {
             type: Number
         },
-    }],
+    },
 
 
 })

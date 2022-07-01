@@ -19,5 +19,5 @@ const ItemSchema = new mongoose.Schema({
         default: moment(Date.now()).format('DD/MM/YYYY hh:mm a')
     },
 })
-const Items = new mongoose.model('Items', ItemSchema)
+const Items =  mongoose.model('Items', ItemSchema)
 module.exports = Items

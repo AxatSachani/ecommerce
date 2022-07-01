@@ -6,10 +6,11 @@ const OrderHistory = require("../models/OrderHistory");
 const Product = require("../models/Product");
 const User = require("../models/User");
 const Invoice = require("../models/Invoice");
+const auth = require("../middleware/Auth");
 const router = express.Router()
 
 // place order
-router.post('/order', async (req, res) => {
+router.post('/order', auth,async (req, res) => {
     const user_id = req.body.user_id
     const cart_id = req.body.cart_id
     const msg = 'Order Placed'
@@ -33,6 +34,9 @@ router.post('/order', async (req, res) => {
 
         // products data
         const cart = await Cart.findById(cart_id)
+        if(!cart){
+            throw new Error('Cart not found')
+        }
         for (var i = 0; i < cart.products.length; i++) {
             total_amount += cart.products[i].amount
         }
@@ -100,7 +104,7 @@ router.post('/order', async (req, res) => {
 
 
 // generate invoice
-router.post('/order/invoice/:id', async (req, res) => {
+router.post('/order/invoice/:id',auth, async (req, res) => {
     const msg = 'Invoice generate'
     const order_id = req.params.id
     var status = 'Mr.'

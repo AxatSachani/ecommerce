@@ -21,9 +21,12 @@ const CartSchema = new mongoose.Schema({
         product_quantity: {
             type: Number
         },
+        product_size: {
+            type: String
+        },
         product_price: {
             type: Number
-        }, 
+        },
         amount: {
             type: Number
         }

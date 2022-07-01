@@ -2,9 +2,11 @@ const express = require('express');
 const Items = require('../models/Items');
 const router = express.Router()
 const moment = require('moment')
+const auth = require('../middleware/Auth')
+
 
 //Add new Item type
-router.post('/add/item', async (req, res) => {
+router.post('/add/item',auth,async (req, res) => {
     const msg = 'Item created'
     try {
         const item_type = req.body.item_type.toUpperCase()
@@ -22,7 +24,7 @@ router.post('/add/item', async (req, res) => {
 
 
 // get all items-types
-router.get('/get/items-types', async (req, res) => {
+router.get('/get/items-types',auth, async (req, res) => {
     const msg = 'All itmes data'
     try {
         const items = await Items.find()
@@ -35,7 +37,7 @@ router.get('/get/items-types', async (req, res) => {
 
 
 // update in items-types
-router.patch('/update/item/:type', async (req, res) => {
+router.patch('/update/item/:type', auth,async (req, res) => {
     const type = req.params.type.toUpperCase()
     const item_type = req.body.item_type
     const createAt = moment(Date.now()).format('DD/MM/YYYY hh:mm a')
@@ -64,7 +66,7 @@ router.patch('/update/item/:type', async (req, res) => {
 
 
 // delete items 
-router.delete('/delete/item/:item', async (req, res) => {
+router.delete('/delete/item/:item', auth,async (req, res) => {
     const item_type = req.params.item.toUpperCase()
     const msg = ' Items deleted'
     try {

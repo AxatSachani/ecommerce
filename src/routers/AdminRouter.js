@@ -1,4 +1,5 @@
 const express = require("express");
+const crypto = require('crypto')
 const res = require("express/lib/response");
 const auth = require("../middleware/Auth");
 const router = express.Router()
@@ -14,8 +15,6 @@ router.post('/admin/signup', async (req, res) => {
     try {
         const admin = await Admin(req.body).save()
         const token = await admin.generateAuthToken()
-        res.set('Content-Type', 'token')
-        // res.token = token
         res.status(201).send({ code: 201, message: msg, data: admin, token })
     } catch (error) {
         res.status(400).send({ code: 400, message: error })
@@ -37,10 +36,10 @@ router.get('/admin/signin', async (req, res) => {
 })
 
 // get seller account create request
-router.get('/get/account/request', auth,async (req, res) => {
+router.get('/get/account/request', auth, async (req, res) => {
     const msg = 'all request for new seller account'
     try {
-        const sellerRequest = await SellerRequest.find({})
+        const sellerRequest = await SellerRequest.find({}).select({ password: 0 })
         const count = await SellerRequest.find({}).countDocuments()
         res.status(200).send({ code: 200, message: msg, totalRequest: count, data: sellerRequest })
     } catch (error) {
@@ -49,7 +48,7 @@ router.get('/get/account/request', auth,async (req, res) => {
 })
 
 // get rejected seller account details
-router.get('/get/seller/reject', async (req, res) => {
+router.get('/get/seller/reject', auth, async (req, res) => {
     const msg = 'all rejected seller account'
     try {
         const sellerRejected = await SellerRejected.find({})
@@ -61,32 +60,39 @@ router.get('/get/seller/reject', async (req, res) => {
 })
 
 //approve or reject 
-router.post('/request/action/:sellerId', async (req, res) => {
+router.post('/request/action/:sellerId', auth, async (req, res) => {
     const _id = req.params.sellerId
     const action = req.body.action
-    const approvMsg = 'new seller created. sent email to seller that confirm your seller account and change your password and continue with your seller account '
     const rejectMsg = 'reject seller account request\nsent email to seller with rejection reason'
     try {
         const sellerRequest = await SellerRequest.findById(_id)
-
-        const first_name = sellerRequest.first_name
-        const last_name = sellerRequest.last_name
-        const emailId = sellerRequest.emailId
-        const contact_no = sellerRequest.contact_no
-        const password = sellerRequest.password
-        const sellerDetails = { _id, first_name, last_name, emailId, contact_no, password }
-        if (action !== 'approved') {
-            const reject_reason = req.body.reject_reason
-            const sellerRejected = await SellerRejected(sellerDetails, reject_reason).save()
-            await SellerRequest.findByIdAndDelete(_id)
-            res.status(200).send({ code: 200, message: rejectMsg, data: sellerRejected })
-
+        if (!sellerRequest) {
+            const msg = 'Seller not found!'
+            res.status(404).send({ code: 404, message: msg })
         } else {
-            const seller = await Seller(sellerDetails)
-            const token = await seller.generateAuthToken()
-            await seller.save()
-            await SellerRequest.findByIdAndDelete(_id)
-            res.status(201).send({ code: 201, message: approvMsg, data: seller, token })
+            const first_name = sellerRequest.first_name
+            const last_name = sellerRequest.last_name
+            const emailId = sellerRequest.emailId
+            const contact_no = sellerRequest.contact_no
+            const password = crypto.randomBytes(6).toString('hex')
+
+            var sellerDetails = { _id, first_name, last_name, emailId, contact_no, password }
+            if (action !== 'approved') {
+                const reject_reason = req.body.reject_reason
+                var sellerDetails = { _id, first_name, last_name, emailId, contact_no, password, reject_reason }
+                const sellerRejected = await SellerRejected(sellerDetails).save()
+                await SellerRequest.findByIdAndDelete(_id)
+                res.status(200).send({ code: 200, message: rejectMsg, data: sellerRejected })
+
+            } else {
+                const approvMsg = `new seller created. sent email to seller that confirm your seller account and change your password and continue with your seller account. current tempory password is: ${password} `
+
+                const seller = await Seller(sellerDetails)
+                console.log(seller.password);
+                await seller.save()
+                await SellerRequest.findByIdAndDelete(_id)
+                res.status(201).send({ code: 201, message: approvMsg, data: seller })
+            }
         }
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })

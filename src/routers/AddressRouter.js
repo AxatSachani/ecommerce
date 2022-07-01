@@ -1,10 +1,11 @@
 const express = require("express");
+const auth = require("../middleware/Auth");
 const router = express.Router()
 const { BillingAddress, ShippingAddress } = require('../models/Address');
 const User = require("../models/User");
 
 // update address
-router.patch('/update/bill-address', async (req, res) => {
+router.patch('/update/bill-address', auth,async (req, res) => {
     const user_id = req.body.user_id
     const address = req.body.address
     const msg = 'Address updated'
@@ -25,7 +26,7 @@ router.patch('/update/bill-address', async (req, res) => {
 
 
 
-router.patch('/update/shipp-address', async (req, res) => {
+router.patch('/update/shipp-address',auth, async (req, res) => {
     const user_id = req.body.user_id
     const msg = 'Address updated'
     try {

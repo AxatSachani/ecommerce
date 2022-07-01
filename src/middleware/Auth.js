@@ -13,18 +13,18 @@ const auth = async (req, res, next) => {
         const admin = await Admin.findOne({ _id: decoded._id, 'tokens.token': token })
 
         if (user) {
-            res.user = user
+            req.user = user
         } else if (seller) {
-            res.seller = seller
+            req.seller = seller
         } else if (admin) {
-            res.admin = admin
+            req.admin = admin
         } else {
             throw new Error('unauthorized access')
         }
         req.token = token
         next()
     } catch (error) {
-        res.status(401).send({ code: 401, message: error.message })
+        res.status(401).send({ code: 401, message: 'unauthorized access' })
     }
 }
 

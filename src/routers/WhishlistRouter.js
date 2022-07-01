@@ -2,10 +2,11 @@ const express = require("express");
 const Whishlist = require("../models/Whishlist");
 const Product = require("../models/Product");
 const User = require("../models/User");
+const auth = require("../middleware/Auth");
 const router = express.Router()
 
 // add to whishlist
-router.post('/add/whishlist', async (req, res) => {
+router.post('/add/whishlist', auth, async (req, res) => {
     const user_id = req.body.user_id
     const product_id = req.body.product_id
     const msg = 'Whishilist added'
@@ -30,7 +31,7 @@ router.post('/add/whishlist', async (req, res) => {
         //     const whishlist = whishlistCheck
         //     res.status(201).send({ code: 201, message: msg, data: {user_id,whishlist} })
         // }
-        res.status(201).send({ code: 201, message: msg, data: {user_id,whishlist} })
+        res.status(201).send({ code: 201, message: msg, data: whishlist })
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })
     }
@@ -58,11 +59,11 @@ router.post('/add/whishlist', async (req, res) => {
 
 
 // delete whishlist
-router.delete('/delete/whishlist/:id', async (req, res) => {
+router.delete('/delete/whishlist/:id', auth, async (req, res) => {
     const msg = 'Whishlist deleted'
     const whishlist_id = req.params.id
     try {
-        const whishlist = await Whishlist.findOneAndDelete({whishlist_id})
+        const whishlist = await Whishlist.findOneAndDelete({ whishlist_id })
         if (!whishlist) {
             throw new Error('Not Found')
         }
@@ -73,15 +74,19 @@ router.delete('/delete/whishlist/:id', async (req, res) => {
 })
 
 // get user-whishlist by userID
-router.get('/get/user-whishlist/:id', async (req, res) => {
+router.get('/get/user-whishlist/:id', auth, async (req, res) => {
     const msg = 'User Whishlist'
     const user_id = req.params.id
     try {
-        const whishlist = await Whishlist.find({ user_id })
-        if (!whishlist) {
+        const user = await User.findById(user_id)
+        if (!user) {
             throw new Error('user not found')
         }
-        res.status(200).send({ code: 200, message: msg, data: whishlist })
+        const whishlist = await Whishlist.find({ user_id }).select({user_id:0})
+        if (!whishlist) {
+            throw new Error('whishlist not found')
+        }
+        res.status(200).send({ code: 200, message: msg, data:{user_id, whishlist} })
     } catch (error) {
         res.status(404).send({ code: 404, message: error.message })
     }

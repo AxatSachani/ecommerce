@@ -51,7 +51,7 @@ const SellerSchema = new mongoose.Schema({
     },
     tokens: [{
         token: {
-            type: Buffer
+            type: String
         }
     }]
 })
@@ -62,6 +62,7 @@ SellerSchema.methods.toJSON = function () {
     const seller = this
     const sellerData = seller.toObject()
     delete sellerData.password
+    delete sellerData.tokens
     return sellerData
 }
 

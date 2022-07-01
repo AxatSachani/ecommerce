@@ -16,6 +16,7 @@ const OrderRouter = require('./routers/OrderRouter')
 const PaymentRouter = require('./routers/PaymentRouter')
 const ForgetPasswordRouter = require('./routers/ForgetPasswordRouter')
 const Photo = require('./routers/Photo')
+const FindProductRouter = require('./routers/FindProductRouter')
 
 const app = express()
 app.use(express.json())
@@ -36,6 +37,8 @@ app.use(OrderRouter)
 app.use(PaymentRouter)
 app.use(ForgetPasswordRouter)
 app.use(Photo)
+app.use(FindProductRouter)
+
 
 
 

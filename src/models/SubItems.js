@@ -5,15 +5,15 @@ const moment = require('moment')
 const SubItemSchema = new mongoose.Schema({
     subItem_type: {
         type: String,
-        required:true,
-        trim:true,
-        uppercase:true
+        required: true,
+        trim: true,
+        uppercase: true
     },
     item_type: {
         type: String,
         required: true,
         trim: true,
-        uppercase:true
+        uppercase: true
     },
     addedBy: {
         type: ObjectId,
@@ -23,6 +23,10 @@ const SubItemSchema = new mongoose.Schema({
         type: String,
         default: moment(Date.now()).format('DD/MM/YYYY hh:mm a')
     },
+    lastUpdate: {
+        type: String,
+        default: moment(Date.now()).format('DD/MM/YYYY hh:mm a')
+    }
 })
 
 const SubItems = mongoose.model('SubItems', SubItemSchema)

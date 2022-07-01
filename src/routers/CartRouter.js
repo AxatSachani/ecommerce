@@ -1,4 +1,5 @@
 const express = require("express");
+const auth = require("../middleware/Auth");
 const router = express.Router()
 const Cart = require('../models/Cart')
 const Product = require('../models/Product');
@@ -6,11 +7,11 @@ const User = require("../models/User");
 
 
 // add cart
-router.post('/add/cart', async (req, res) => {
+router.post('/add/cart', auth, async (req, res) => {
     const msg = 'Cart added'
     const user_id = req.body.user_id
     const product_id = req.body.product_id
-    const product_size = req.body.product_size
+    const product_size = req.body.product_size.toUpperCase()
     var productDetails, seller_id, product_name, product_price, amount, cartData, cart, product_quantity = 1
     try {
         productDetails = await Product.findById(product_id)
@@ -38,11 +39,11 @@ router.post('/add/cart', async (req, res) => {
 
 
 // update cart quantity-increase
-router.patch('/update/cart/quantity-increase', async (req, res) => {
+router.patch('/update/cart/quantity-increase', auth, async (req, res) => {
     const msg = 'Cart updated'
+    const user_id = req.body.user_id
+    const productCart_id = req.body.productCart_id
     try {
-        const user_id = req.body.user_id
-        const productCart_id = req.body.productCart_id
         var cart = await Cart.findOne({ user_id })
         for (var i = 0; i < cart.products.length; i++) {
             const product = cart.products[i]._id == productCart_id
@@ -61,11 +62,11 @@ router.patch('/update/cart/quantity-increase', async (req, res) => {
 
 
 // update cart quantity-decrease
-router.patch('/update/cart/quantity-decrease', async (req, res) => {
+router.patch('/update/cart/quantity-decrease', auth, async (req, res) => {
     const msg = 'Cart updated'
+    const user_id = req.body.user_id
+    const productCart_id = req.body.productCart_id
     try {
-        const user_id = req.body.user_id
-        const productCart_id = req.body.productCart_id
         var cart = await Cart.findOne({ user_id })
         for (var i = 0; i < cart.products.length; i++) {
             const product = cart.products[i]._id == productCart_id
@@ -84,13 +85,22 @@ router.patch('/update/cart/quantity-decrease', async (req, res) => {
 
 
 // delete product from cart
-router.delete('/delete/cart-product', async (req, res) => {
+router.delete('/delete/cart-product', auth, async (req, res) => {
     const user_id = req.body.user_id
-    const product_number = req.body.product_number
+    const productCart_id = req.body.productCart_id
     const msg = 'Cart updated'
     try {
         const cart = await Cart.findOne({ user_id })
-        cart.products.splice(product_number, 1)
+        if (!cart) {
+            throw new Error('cart not available')
+        }
+        for (var i = 0; i < cart.products.length; i++) {
+            const product = cart.products[i]._id == productCart_id
+            if (product) {
+                cart.products.splice(i, 1)
+                break;
+            }
+        }
         await cart.save()
         res.status(200).send({ code: 200, message: msg, data: cart })
     } catch (error) {
@@ -100,7 +110,7 @@ router.delete('/delete/cart-product', async (req, res) => {
 
 
 // delete whole cart
-router.delete('/delete/cart', async (req, res) => {
+router.delete('/delete/cart', auth, async (req, res) => {
     const user_id = req.body.user_id
     const msg = 'Cart deleted'
     try {
@@ -115,7 +125,7 @@ router.delete('/delete/cart', async (req, res) => {
 })
 
 // get cartDetails by user 
-router.get('/get/user-cart/:id', async (req, res) => {
+router.get('/get/user-cart/:id', auth, async (req, res) => {
     const msg = 'User Cart'
     const user_id = req.params.id
     try {

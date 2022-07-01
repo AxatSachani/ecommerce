@@ -2,9 +2,10 @@ const express = require("express");
 const moment = require('moment')
 const SubItems = require("../models/SubItems");
 const router = express.Router()
+const auth = require('../middleware/Auth')
 
 //add new subItem-type
-router.post('/add/subitem', async (req, res) => {
+router.post('/add/subitem', auth,async (req, res) => {
     const subItem_type = req.body.subItem_type.toUpperCase()
     const item_type = req.body.item_type.toUpperCase()
     const msg = 'SubItem created'
@@ -23,7 +24,7 @@ router.post('/add/subitem', async (req, res) => {
 })
 
 // get all subitems
-router.get('/get/subitems-type', async (req, res) => {
+router.get('/get/subitems-type',auth, async (req, res) => {
     const msg = 'all subItems data'
     try {
         const subItems = await SubItems.find()
@@ -35,14 +36,14 @@ router.get('/get/subitems-type', async (req, res) => {
 })
 
 // update subitems
-router.patch('/update/subitem/:item/:type', async (req, res) => {
+router.patch('/update/subitem/:item/:type',auth, async (req, res) => {
     const item = req.params.item.toUpperCase()
     const type = req.params.type.toUpperCase()
     const subItem_type = req.body.subItem_type
-    const createAt = moment(Date.now()).format('DD/MM/YYYY hh:mm a')
+    const lastUpdate = moment(Date.now()).format('DD/MM/YYYY hh:mm a')
     const msg = 'subItem updated'
     try {
-        const subItem = await SubItems.findOneAndUpdate({ subItem_type: type, item_type: item }, { subItem_type, createAt })
+        const subItem = await SubItems.findOneAndUpdate({ subItem_type: type, item_type: item }, { subItem_type, lastUpdate })
         if (!subItem) {
             throw new Error(`No item found with type: '${item}','${type}' `)
         }
@@ -53,7 +54,7 @@ router.patch('/update/subitem/:item/:type', async (req, res) => {
 })
 
 // delete subitems
-router.delete('/delete/subitem/:item/:type', async (req, res) => {
+router.delete('/delete/subitem/:item/:type', auth,async (req, res) => {
     const item_type = req.params.item.toUpperCase()
     const subItem_type = req.params.type.toUpperCase()
     const msg = 'subItem deleted'

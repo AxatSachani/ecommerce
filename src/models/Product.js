@@ -7,7 +7,7 @@ const AddProductSchema = new mongoose.Schema({
         required: true
     },
     product_details: {
-        type:Object,
+        type: Object,
         name: {
             type: String,
             required: true,
@@ -19,13 +19,11 @@ const AddProductSchema = new mongoose.Schema({
         },
     },
     size: [{
-        type: Object,
-        size: {
-            type: String
-        },
+        type: String,
+        uppercase:true
     }],
-    quantity:{
-        type:Number
+    quantity: {
+        type: Number
     },
     product_price: {
         type: Number,
@@ -36,12 +34,12 @@ const AddProductSchema = new mongoose.Schema({
         required: true,
         uppercase: true
     },
-    sub_category: {
+    subItem_type: {
         type: String,
         required: true,
         uppercase: true
     },
-    item_category: {
+    item_type: {
         type: String,
         required: true,
         uppercase: true
