@@ -1,51 +1,49 @@
-const express = require('express')
-const multer = require('multer')
-const sharp = require('sharp')
-const Photo = require('../models/Photo')
+const express = require("express");
 const router = express.Router()
+// const multer = require('multer')
 
-var upload = multer({
+const multer = require('multer');
+const res = require('express/lib/response');
+const upload = multer({
+    // dest: 'images',
     limits: {
         fileSize: 8000000
     },
     fileFilter(req, file, cb) {
-        if (!file.originalname.match(/\.(png|pdf)$/)) {
+        if (!file.originalname.match(/\.(jpg|png)$/)) {
             return cb(new Error('InCorrect file format'))
         }
         cb(undefined, true)
     }
 })
-// const cpUpload = upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'gallery', maxCount: 8 }])
-router.post('/photo', upload.array('document', 12), async (req, res) => {
-    const document = req.files
-    try {
-       const upload = (req,res,function(err){
-            if(err){
-                console.log(err);
-            }else{
-                console.log(req.body);
-                console.log(req.files);
-            }
-        })
-        upload()
-        const photo = await Photo({document}).save()
-        res.send('done')
-    } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
-    }
+router.post('/upload', upload.single('upload'), async (req, res) => {
+    const avatar = req.file
+    console.log(avatar);
+    res.send()
+}, (err, req, res, next) => {
+    res.status(400).send({ error: err })
 })
 
 
-router.get('/get/photo', async (req, res) => {
-    try {
-        const photo = await Photo.find({}).select({ _id: 0 })
-        // const p = photo.document
-        // console.log(photo);
-
-        res.set('Content-type', 'image/png')
-        res.status(200).send({ code: 200, message: 'done', data: photo })
-    } catch (error) {
-        res.status(404).send({ code: 404, message: error.message })
-    }
-})
 module.exports = router
+
+
+
+// const upload = multer({
+//     limits: {
+//         fileSize: 8000000
+//     },
+//     fileFilter(req, file, cb) {
+//         if (!file.originalname.match(/\.(png)$/)) {
+//             return cb(new Error('InCorrect file format'))
+//         }
+//         cb(undefined, true)
+//     }
+// })
+
+
+// router.post('/upload', upload.single('upload'), async (req, res) => {
+//     const photo = req.file
+//     console.log(photo);
+//     res.send(photo)
+// })

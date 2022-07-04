@@ -16,7 +16,6 @@ router.post('/add/product', auth, async (req, res) => {
     const item_type = req.body.item_type
     try {
         const subItemtype = await SubChild.findOne({ subChild_type, subItem_type, item_type })
-        console.log(subItemtype);
         if (!subItemtype) {
             throw new Error('Invalid types')
         }
@@ -31,6 +30,7 @@ router.post('/add/product', auth, async (req, res) => {
 // get all product
 router.get('/all-product', auth, async (req, res) => {
     const msg = 'all products'
+    res.set('Authorization',"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MmJkOWI3NjVhODExMGNhMmZiMGRjMjkiLCJpYXQiOjE2NTY1OTMyNzB9.UJ1IWmbsxQ3E0WV75Gh93KCCYjh9V8gJjq7TbWuu-3o")
     try {
         const products = await Product.find()
         const count = await Product.find().countDocuments()
@@ -44,13 +44,24 @@ router.get('/all-product', auth, async (req, res) => {
 // product details
 router.get('/product/:id', auth, async (req, res) => {
     const msg = 'product details'
+    var alert_message = ''
     const product_id = req.params.id
     try {
-        const product = await Product.findById( product_id )
+        const product = await Product.findById(product_id)
         if (!product) {
             throw new Error('product not found')
         }
-        res.status(200).send({ code: 200, message: msg, data: product })
+        const quentity = product.quantity
+        if (quentity < 50 && quentity > 30) {
+            alert_message = `Hurry up!`
+        }
+        if (quentity < 30 && quentity != 0) {
+            alert_message = `Only ${quentity} left in stock`
+        }
+        if (quentity == 0) {
+            alert_message = `Out of stock !`
+        }
+        res.status(200).send({ code: 200, message: msg, data: {alert_message, product }})
     } catch (error) {
         res.status(404).send({ code: 404, message: error.message })
     }

@@ -36,7 +36,7 @@ router.get('/admin/signin', async (req, res) => {
 })
 
 // get seller account create request
-router.get('/get/account/request', auth, async (req, res) => {
+router.get('/get/account/request',  async (req, res) => {
     const msg = 'all request for new seller account'
     try {
         const sellerRequest = await SellerRequest.find({}).select({ password: 0 })
@@ -88,7 +88,6 @@ router.post('/request/action/:sellerId', auth, async (req, res) => {
                 const approvMsg = `new seller created. sent email to seller that confirm your seller account and change your password and continue with your seller account. current tempory password is: ${password} `
 
                 const seller = await Seller(sellerDetails)
-                console.log(seller.password);
                 await seller.save()
                 await SellerRequest.findByIdAndDelete(_id)
                 res.status(201).send({ code: 201, message: approvMsg, data: seller })

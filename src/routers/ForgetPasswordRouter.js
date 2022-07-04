@@ -26,7 +26,6 @@ router.post('/seller/generateOTP', auth,async (req, res) => {
         }
         setTimeout(async () => {
             await ForgetPassword.findOneAndDelete({ emailId })
-            console.log('delete');
         }, 120000);
         res.send({ message: 'OTP sent' })
     } catch (error) {

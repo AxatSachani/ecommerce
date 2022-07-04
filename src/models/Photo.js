@@ -4,9 +4,13 @@ const mongoose = require('mongoose')
 
 
 const PhotoSchema = new mongoose.Schema({
- 
-    document: {
-        type: Array
+    photo: {
+        type: String,
+        required: true
+    },
+    data: {
+        type: String,
+        required: true
     }
 })
 

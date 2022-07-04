@@ -1,0 +1,127 @@
+{
+  _id: new ObjectId("62be74bc08f15c01afe7a1ff"),
+  user_id: new ObjectId("62bd9b765a8110ca2fb0dc29"),
+  user_name: ' axat pqr',
+  user_emailId: 'abcw@gmail.com',
+  user_contact: 123,
+  products: [
+    {
+      product_id: new ObjectId("62bd990e28770940941a7df7"),
+      seller_id: new ObjectId("62bd90111e1001cbd8260386"),
+      product_name: 't-shirt',
+      product_quantity: 1,
+      product_price: 2500,
+      amount: 2500,
+      _id: new ObjectId("62bda0a4487d66e6923a56bf")
+    },
+    {
+      product_id: new ObjectId("62bd990e28770940941a7df7"),
+      seller_id: new ObjectId("62bd90111e1001cbd8260386"),
+      product_name: 't-shirt',
+      product_quantity: 2,
+      product_price: 2500,
+      amount: 5000,
+      _id: new ObjectId("62bda0a8487d66e6923a56c6")
+    },
+    {
+      product_id: new ObjectId("62bd990e28770940941a7df7"),
+      seller_id: new ObjectId("62bd90111e1001cbd8260386"),
+      product_name: 't-shirt',
+      product_quantity: 1,
+      product_price: 2500,
+      amount: 2500,
+      _id: new ObjectId("62bda0ad487d66e6923a56cd")
+    }
+  ],
+  total_amount: 10000,
+  payable_amount: 10000,
+  billAddress: 'mumbai',
+  shippAddress: 'mumbai',
+  order_time: '01/07/2022 09:44 AM',
+  payment: 'success',
+  __v: 0
+},{
+  _id: new ObjectId("62c26dd56295a48514416151"),
+  user_id: new ObjectId("62bd9b765a8110ca2fb0dc29"),
+  user_name: ' axat pqr',
+  user_emailId: 'abcw@gmail.com',
+  user_contact: 123,
+  products: [
+    {
+      product_id: new ObjectId("62bd990e28770940941a7df7"),
+      seller_id: new ObjectId("62bd90111e1001cbd8260386"),
+      product_name: 't-shirt',
+      product_quantity: 1,
+      product_price: 2500,
+      amount: 2500,
+      _id: new ObjectId("62c26dc96295a48514416138")
+    },
+    {
+      product_id: new ObjectId("62bd990e28770940941a7df7"),
+      seller_id: new ObjectId("62bd90111e1001cbd8260386"),
+      product_name: 't-shirt',
+      product_quantity: 1,
+      product_price: 2500,
+      amount: 2500,
+      _id: new ObjectId("62c26dca6295a4851441613f")
+    },
+    {
+      product_id: new ObjectId("62bd990e28770940941a7df7"),
+      seller_id: new ObjectId("62bd90111e1001cbd8260386"),
+      product_name: 't-shirt',
+      product_quantity: 1,
+      product_price: 2500,
+      amount: 2500,
+      _id: new ObjectId("62c26dcb6295a48514416146")
+    }
+  ],
+  total_amount: 7500,
+  payable_amount: 7500,
+  billAddress: 'mumbai',
+  shippAddress: 'mumbai',
+  order_time: '04/07/2022 10:02 AM',
+  payment: 'success',
+  __v: 0
+},{
+  _id: new ObjectId("62c26ed11c221c9aeb5731d2"),
+  user_id: new ObjectId("62bd9b765a8110ca2fb0dc29"),
+  user_name: ' axat pqr',
+  user_emailId: 'abcw@gmail.com',
+  user_contact: 123,
+  products: [
+    {
+      product_id: new ObjectId("62bd990e28770940941a7df7"),
+      seller_id: new ObjectId("62bd90111e1001cbd8260386"),
+      product_name: 't-shirt',
+      product_quantity: 1,
+      product_price: 2500,
+      amount: 2500,
+      _id: new ObjectId("62c26ec91c221c9aeb5731b9")
+    },
+    {
+      product_id: new ObjectId("62bd990e28770940941a7df7"),
+      seller_id: new ObjectId("62bd90111e1001cbd8260386"),
+      product_name: 't-shirt',
+      product_quantity: 1,
+      product_price: 2500,
+      amount: 2500,
+      _id: new ObjectId("62c26ec91c221c9aeb5731c0")
+    },
+    {
+      product_id: new ObjectId("62bd990e28770940941a7df7"),
+      seller_id: new ObjectId("62bd90111e1001cbd8260386"),
+      product_name: 't-shirt',
+      product_quantity: 1,
+      product_price: 2500,
+      amount: 2500,
+      _id: new ObjectId("62c26eca1c221c9aeb5731c7")
+    }
+  ],
+  total_amount: 7500,
+  payable_amount: 7500,
+  billAddress: 'mumbai',
+  shippAddress: 'mumbai',
+  order_time: '04/07/2022 10:06 AM',
+  payment: 'success',
+  __v: 0
+}

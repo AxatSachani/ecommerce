@@ -1,5 +1,4 @@
 const express = require('express')
-const fileUpload = require('express-fileupload');
 require('dotenv').config()
 require('./database/database')
 const AdminRoter = require('./routers/AdminRouter')
@@ -15,13 +14,15 @@ const AddressRouter = require('./routers/AddressRouter')
 const OrderRouter = require('./routers/OrderRouter')
 const PaymentRouter = require('./routers/PaymentRouter')
 const ForgetPasswordRouter = require('./routers/ForgetPasswordRouter')
-const Photo = require('./routers/Photo')
+const Photo = require('./routers/photo')
 const FindProductRouter = require('./routers/FindProductRouter')
+const Backup = require('./routers/BackupRouter')
+
 
 const app = express()
 app.use(express.json())
-app.use(fileUpload());
 const port = process.env.PORT
+
 
 app.use(AdminRoter)
 app.use(ItemRouter)
@@ -38,8 +39,7 @@ app.use(PaymentRouter)
 app.use(ForgetPasswordRouter)
 app.use(Photo)
 app.use(FindProductRouter)
-
-
+app.use(Backup)
 
 
 app.listen(port, () => {

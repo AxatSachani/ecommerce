@@ -14,10 +14,13 @@ const auth = async (req, res, next) => {
 
         if (user) {
             req.user = user
+            console.log('user');
         } else if (seller) {
             req.seller = seller
+            console.log('seller');
         } else if (admin) {
             req.admin = admin
+            console.log('admin');
         } else {
             throw new Error('unauthorized access')
         }

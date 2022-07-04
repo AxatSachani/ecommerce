@@ -12,14 +12,14 @@ const encrypt = (String) => {
 }
 
 // decrypt
-const decrypt = (hash)=>{
-    const decipher = crypto.createDecipheriv(algorithm,secretKey,iv)
-    let decryptedData = decipher.update(hesh,'hex','utf-8')
-    decryptedData+= decipher.final('utf-8')
+const decrypt = (hash) => {
+    const decipher = crypto.createDecipheriv(algorithm, secretKey, iv)
+    let decryptedData = decipher.update(hesh, 'hex', 'utf-8')
+    decryptedData += decipher.final('utf-8')
     return decryptedData
 }
 
-module.exports ={
+module.exports = {
     encrypt,
     decrypt
 }

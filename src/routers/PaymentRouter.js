@@ -16,7 +16,7 @@ router.post('/order/payment/:id', async (req, res) => {
     const expiry_year = req.body.expiry_year
     try {
         const orderData = await Order.findById(order_id)
-        const amount = orderData.payable_amount
+        // const amount = orderData.payable_amount
 
         const stripeCustomer = await stripe.customers.create({
             email: orderData.user_emailId,
@@ -26,16 +26,16 @@ router.post('/order/payment/:id', async (req, res) => {
         const paymentMethod = await stripe.paymentMethods.create({
             type: 'card',
             card: {
-                number: card_number,
-                exp_month: expiry_month,
-                exp_year: expiry_year,
-                cvc: cvv_number
+                number: req.body.card_number,
+                exp_month: req.body.expiry_month,
+                exp_year: req.body.expiry_year,
+                cvc: req.body.cvv_number
             }
         })
         console.log('card');
         const paymentIntent = await stripe.paymentIntents.create({
             payment_method: paymentMethod.id,
-            amount: amount * 100,
+            amount: orderData.payable_amount * 100,
             currency: 'inr',
             payment_method_types: ['card'],
             customer: stripeCustomer.id

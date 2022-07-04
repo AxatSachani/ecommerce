@@ -46,7 +46,7 @@ const SellerRequestSchema = new mongoose.Schema({
         }
     },
     document: {
-        type: Array
+        type: String
     }
 })
 

@@ -20,11 +20,11 @@ const upload = multer({
         }
         cb(undefined, true)
     }
-})
+}).single('document')
 
 router.post('/request/account', async (req, res) => {
     const msg = 'new request create for seller account'
-    // const document = req.files
+    // const document = req.file.document
     // console.log(document);
     // const first_name = req.body.first_name
     // const last_name = req.body.last_name
@@ -44,14 +44,12 @@ router.post('/request/account', async (req, res) => {
         }
         const sellerRequest = await SellerRequest(req.body)
         await sellerRequest.save()
-        res.status(201).send({ code: 201, message: msg, data: sellerRequest })
+        res.status(201).send({ code: 201, message: msg, data: data })
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })
     }
 })
 
-// const multer = require('multer');
-// const res = require('express/lib/response');
 
 
 // signin with seller ID
