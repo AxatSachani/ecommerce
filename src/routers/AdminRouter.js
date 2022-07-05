@@ -98,4 +98,10 @@ router.post('/request/action/:sellerId', auth, async (req, res) => {
     }
 })
 
+
+// update admin data
+router.post('/update/admin/:id',auth,async(req,res)=>{
+    
+})
+
 module.exports = router

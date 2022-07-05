@@ -39,7 +39,7 @@ router.post('/add/cart', auth, async (req, res) => {
 
 
 // update cart quantity-increase
-router.patch('/update/cart/quantity-increase', auth, async (req, res) => {
+router.post('/update/cart/quantity-increase', auth, async (req, res) => {
     const msg = 'Cart updated'
     const user_id = req.body.user_id
     const productCart_id = req.body.productCart_id
@@ -62,7 +62,7 @@ router.patch('/update/cart/quantity-increase', auth, async (req, res) => {
 
 
 // update cart quantity-decrease
-router.patch('/update/cart/quantity-decrease', auth, async (req, res) => {
+router.post('/update/cart/quantity-decrease', auth, async (req, res) => {
     const msg = 'Cart updated'
     const user_id = req.body.user_id
     const productCart_id = req.body.productCart_id

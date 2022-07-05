@@ -44,7 +44,7 @@ router.post('/request/account', async (req, res) => {
         }
         const sellerRequest = await SellerRequest(req.body)
         await sellerRequest.save()
-        res.status(201).send({ code: 201, message: msg, data: data })
+        res.status(201).send({ code: 201, message: msg, data: sellerRequest })
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })
     }
@@ -92,7 +92,7 @@ router.get('/seller/signout', auth, async (req, res) => {
 
 
 //update seller profile
-router.patch('/update/seller/:id', auth, async (req, res) => {
+router.post('/update/seller/:id', auth, async (req, res) => {
     const id = req.params.id
     const msg = 'data updated'
     const update_field = Object.keys(req.body)

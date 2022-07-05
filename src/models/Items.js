@@ -18,6 +18,10 @@ const ItemSchema = new mongoose.Schema({
         type: String,
         default: moment(Date.now()).format('DD/MM/YYYY hh:mm a')
     },
+    updateAt: {
+        type: String,
+        default: moment(Date.now()).format('DD/MM/YYYY hh:mm a')
+    }
 })
 const Items =  mongoose.model('Items', ItemSchema)
 module.exports = Items

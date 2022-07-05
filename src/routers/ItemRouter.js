@@ -6,7 +6,7 @@ const auth = require('../middleware/Auth')
 
 
 //Add new Item type
-router.post('/add/item',auth,async (req, res) => {
+router.post('/add/item', auth, async (req, res) => {
     const msg = 'Item created'
     try {
         const item_type = req.body.item_type.toUpperCase()
@@ -24,7 +24,7 @@ router.post('/add/item',auth,async (req, res) => {
 
 
 // get all items-types
-router.get('/get/items-types',auth, async (req, res) => {
+router.get('/get/items-types', auth, async (req, res) => {
     const msg = 'All itmes data'
     try {
         const items = await Items.find()
@@ -37,16 +37,21 @@ router.get('/get/items-types',auth, async (req, res) => {
 
 
 // update in items-types
-router.patch('/update/item/:type', auth,async (req, res) => {
-    const type = req.params.type.toUpperCase()
-    const item_type = req.body.item_type
+router.post('/update/item/', auth, async (req, res) => {
+    const olditem_type = req.body.olditem_type.toUpperCase()
+    const item_type = req.body.newitem_type
     const createAt = moment(Date.now()).format('DD/MM/YYYY hh:mm a')
     const msg = 'item-type updated'
     try {
-        const item = await Items.findOneAndUpdate({ item_type: type }, { item_type, createAt })
+        const item = await Items.findOne({ item_type: olditem_type })
         if (!item) {
-            throw new Error(`no item found with type: '${type}' `)
+            throw new Error(`no item found with type: '${olditem_type}' `)
         }
+        item.item_type =item_type
+        item.updateAt = createAt
+        await item.save()
+        // await Items.findOneAndUpdate(, { item_type, createAt })
+
         res.status(200).send({ code: 200, message: msg })
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })
@@ -66,7 +71,7 @@ router.patch('/update/item/:type', auth,async (req, res) => {
 
 
 // delete items 
-router.delete('/delete/item/:item', auth,async (req, res) => {
+router.delete('/delete/item/:item', auth, async (req, res) => {
     const item_type = req.params.item.toUpperCase()
     const msg = ' Items deleted'
     try {

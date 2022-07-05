@@ -41,7 +41,6 @@ app.use(Photo)
 app.use(FindProductRouter)
 app.use(Backup)
 
-
-app.listen(port, () => {
+app.listen(3000,'192.168.29.2', () => {
     console.log(`server running on ${port}`);
 })

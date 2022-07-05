@@ -86,7 +86,7 @@ router.get('/get/user-whishlist/:id', auth, async (req, res) => {
         if (!whishlist) {
             throw new Error('whishlist not found')
         }
-        res.status(200).send({ code: 200, message: msg, data:{user_id, whishlist} })
+        res.status(200).send({ code: 200, message: msg, data: whishlist })
     } catch (error) {
         res.status(404).send({ code: 404, message: error.message })
     }

@@ -30,7 +30,6 @@ router.post('/add/product', auth, async (req, res) => {
 // get all product
 router.get('/all-product', auth, async (req, res) => {
     const msg = 'all products'
-    res.set('Authorization',"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MmJkOWI3NjVhODExMGNhMmZiMGRjMjkiLCJpYXQiOjE2NTY1OTMyNzB9.UJ1IWmbsxQ3E0WV75Gh93KCCYjh9V8gJjq7TbWuu-3o")
     try {
         const products = await Product.find()
         const count = await Product.find().countDocuments()

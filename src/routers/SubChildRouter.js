@@ -47,13 +47,14 @@ router.get('/get/subChild', auth, async (req, res) => {
 })
 
 // Update
-router.patch('/update/:item/:type/:child', auth, async (req, res) => {
-    const item_type = req.params.item.toUpperCase()
-    const subItem_type = req.params.type.toUpperCase()
-    const subChild_type = req.params.child.toUpperCase()
+router.post('/update/sub-child', auth, async (req, res) => {
+    const item_type = req.body.item_type.toUpperCase()
+    const subItem_type = req.body.subItem_type.toUpperCase()
+    const subChild_type = req.body.oldsubChild_type.toUpperCase()
+    const newsubChild_type = req.body.newsubChild_type.toUpperCase()
     const msg = 'updated successfully'
     try {
-        const subChild = await SubChild.findOneAndUpdate({ subChild_type, subItem_type, item_type }, req.body)
+        const subChild = await SubChild.findOneAndUpdate({ subChild_type, subItem_type, item_type }, {subChild_type:newsubChild_type})
         if (!subChild) {
             throw new Error(`Something wrong. Check types`)
         }

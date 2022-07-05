@@ -23,7 +23,7 @@ const SubItemSchema = new mongoose.Schema({
         type: String,
         default: moment(Date.now()).format('DD/MM/YYYY hh:mm a')
     },
-    lastUpdate: {
+    updateAt: {
         type: String,
         default: moment(Date.now()).format('DD/MM/YYYY hh:mm a')
     }

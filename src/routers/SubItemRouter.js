@@ -36,17 +36,20 @@ router.get('/get/subitems-type',auth, async (req, res) => {
 })
 
 // update subitems
-router.patch('/update/subitem/:item/:type',auth, async (req, res) => {
-    const item = req.params.item.toUpperCase()
-    const type = req.params.type.toUpperCase()
-    const subItem_type = req.body.subItem_type
-    const lastUpdate = moment(Date.now()).format('DD/MM/YYYY hh:mm a')
+router.post('/update/subitem/',auth, async (req, res) => {
+    const item_type = req.body.item_type.toUpperCase()
+    const oldsubItem_type = req.body.oldsubItem_type.toUpperCase()
+    const newsubItem_type = req.body.newsubItem_type
+    const updateAt = moment(Date.now()).format('DD/MM/YYYY hh:mm a')
     const msg = 'subItem updated'
     try {
-        const subItem = await SubItems.findOneAndUpdate({ subItem_type: type, item_type: item }, { subItem_type, lastUpdate })
-        if (!subItem) {
-            throw new Error(`No item found with type: '${item}','${type}' `)
+        const subItem = await SubItems.findOne({ subItem_type: oldsubItem_type, item_type: item_type })
+        if(!subItem){
+            throw new Error(`No item found with type: '${item_type}','${oldsubItem_type}' `)
         }
+        subItem.subItem_type =newsubItem_type
+        subItem.updateAt = updateAt
+        await subItem.save()
         res.status(200).send({ code: 200, message: msg })
     } catch (error) {
         res.status(400).send({ code: 400, message: error.message })
