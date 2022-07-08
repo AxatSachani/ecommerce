@@ -8,15 +8,29 @@ const auth = require("../middleware/Auth");
 // user Signup
 router.post('/user/signup', async (req, res) => {
     const msg = 'User created'
+    const first_name = req.body.first_name
+    const last_name = req.body.last_name
+    const emailId = req.body.emailId
+    const contact_no = req.body.contact_no
+    const gender = req.body.gender
+    const address = req.body.address
+    const password = req.body.password
+
+    const data = { first_name, last_name, emailId, contact_no, gender, address, password }
     try {
+        console.log('http://192.168.29.2:3000/user/signup');
         const user = await User(req.body)
+        console.log('user', data);
         const token = await user.generateAuthToken()
+        console.log('token', token);
         const addressDetails = { user_id: user._id, address: req.body.address }
         await user.save()
+        console.log('save');
         await BillingAddress(addressDetails).save()
         await ShippingAddress(addressDetails).save()
-        res.status(201).send({ code: 201, message: msg, data: user, token })
+        res.status(200).send({ code: 201, message: msg, data: user, token })
     } catch (error) {
+        console.log('unformatted');
         res.status(400).send({ code: 400, message: error.message })
     }
 })
@@ -36,7 +50,7 @@ router.get('/user/signin', async (req, res) => {
 
 
 // update user details
-router.patch('/update/user/:id', auth, async (req, res) => {
+router.patch('/user/:id', auth, async (req, res) => {
     const msg = 'User updated'
     const id = req.params.id
     try {

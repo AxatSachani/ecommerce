@@ -11,7 +11,7 @@ router.get('/product/:item_type/:subChild_type', auth, async (req, res) => {
 
     // console.log(typeof (item_type, subChild_type));
     try {
-        const product = await Product.find({item_type, subChild_type}) //.$where(item_type, subChild_type)
+        const product = await Product.find({item_type, subChild_type}).select({_id:1,product_details:1,product_price:1}) //.$where(item_type, subChild_type)
         if(product.length==0){
             throw new Error('Product not found')
         }

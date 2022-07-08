@@ -28,21 +28,21 @@ const UserSchema = new mongoose.Schema({
         }
     },
     contact_no: {
-        type: Number,
+        type: String,
         required: true,
-        trim: true
+        // trim: true
     },
     gender: {
         type: String,
         required: true,
-        trim: true
+        // trim: true
     },
     address: {
         type: String,
         required: true,
     },
     alterContact_no: {
-        type: Number
+        type: String
     },
     password: {
         type: String,

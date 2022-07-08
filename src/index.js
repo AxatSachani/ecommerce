@@ -1,6 +1,3 @@
-const express = require('express')
-require('dotenv').config()
-require('./database/database')
 const AdminRoter = require('./routers/AdminRouter')
 const ItemRouter = require('./routers/ItemRouter')
 const SubItemRouter = require('./routers/SubItemRouter')
@@ -16,31 +13,26 @@ const PaymentRouter = require('./routers/PaymentRouter')
 const ForgetPasswordRouter = require('./routers/ForgetPasswordRouter')
 const Photo = require('./routers/photo')
 const FindProductRouter = require('./routers/FindProductRouter')
-const Backup = require('./routers/BackupRouter')
+const Backup = require('./routers/BackupRouter');
+
+const router = {
+    AdminRoter,
+    ItemRouter,
+    SubItemRouter,
+    SubChildRouter,
+    SellerRouter,
+    ProductRouter,
+    UserRouter,
+    CartRouter,
+    WhishlistRouter,
+    AddressRouter,
+    OrderRouter,
+    PaymentRouter,
+    ForgetPasswordRouter,
+    Photo,
+    FindProductRouter,
+    Backup
+}
+module.exports=router
 
 
-const app = express()
-app.use(express.json())
-const port = process.env.PORT
-
-
-app.use(AdminRoter)
-app.use(ItemRouter)
-app.use(SubItemRouter)
-app.use(SubChildRouter)
-app.use(SellerRouter)
-app.use(ProductRouter)
-app.use(UserRouter)
-app.use(CartRouter)
-app.use(WhishlistRouter)
-app.use(AddressRouter)
-app.use(OrderRouter)
-app.use(PaymentRouter)
-app.use(ForgetPasswordRouter)
-app.use(Photo)
-app.use(FindProductRouter)
-app.use(Backup)
-
-app.listen(3000,'192.168.29.2', () => {
-    console.log(`server running on ${port}`);
-})

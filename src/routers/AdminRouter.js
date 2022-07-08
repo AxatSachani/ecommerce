@@ -36,8 +36,8 @@ router.get('/admin/signin', async (req, res) => {
 })
 
 // get seller account create request
-router.get('/get/account/request',  async (req, res) => {
-    const msg = 'all request for new seller account'
+router.get('/account/request', async (req, res) => {
+    const msg = 'account request'
     try {
         const sellerRequest = await SellerRequest.find({}).select({ password: 0 })
         const count = await SellerRequest.find({}).countDocuments()
@@ -48,7 +48,7 @@ router.get('/get/account/request',  async (req, res) => {
 })
 
 // get rejected seller account details
-router.get('/get/seller/reject', auth, async (req, res) => {
+router.get('/rejected/seller', auth, async (req, res) => {
     const msg = 'all rejected seller account'
     try {
         const sellerRejected = await SellerRejected.find({})
@@ -100,8 +100,8 @@ router.post('/request/action/:sellerId', auth, async (req, res) => {
 
 
 // update admin data
-router.post('/update/admin/:id',auth,async(req,res)=>{
-    
+router.post('/update/admin/:id', auth, async (req, res) => {
+
 })
 
 module.exports = router

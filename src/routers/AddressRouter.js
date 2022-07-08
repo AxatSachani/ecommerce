@@ -5,12 +5,15 @@ const { BillingAddress, ShippingAddress } = require('../models/Address');
 const User = require("../models/User");
 
 // update address
-router.post('/update/bill-address', auth, async (req, res) => {
+router.patch('/user/billing-address', auth, async (req, res) => {
     const user_id = req.body.user_id
     const address = req.body.address
     const msg = 'Address updated'
     try {
         const user = await User.findByIdAndUpdate(user_id, { address })
+        if(!user){
+            throw new Error('User not found')
+        }
         const userBillAddress = await BillingAddress.findOne({ user_id })
         userBillAddress.address = address
         await userBillAddress.save()
@@ -26,11 +29,14 @@ router.post('/update/bill-address', auth, async (req, res) => {
 
 
 
-router.post('/update/shipp-address', auth, async (req, res) => {
+router.patch('/user/shipping-address', auth, async (req, res) => {
     const user_id = req.body.user_id
     const msg = 'Address updated'
     try {
         const user = await ShippingAddress.findOne({ user_id })
+        if(!user){
+            throw new Error('User not found')
+        }
         user.address = req.body.address
         await user.save()
         res.status(200).send({ code: 200, message: msg })

@@ -28,10 +28,10 @@ router.post('/add/product', auth, async (req, res) => {
 })
 
 // get all product
-router.get('/all-product', auth, async (req, res) => {
+router.get('/products', auth, async (req, res) => {
     const msg = 'all products'
     try {
-        const products = await Product.find()
+        const products = await Product.find().select({_id:1,product_details:1,product_price:1})
         const count = await Product.find().countDocuments()
         res.status(200).send({ code: 200, message: msg, totalProduct: count, data: products })
     } catch (error) {

@@ -7,7 +7,7 @@ const OrderHistory = require("../models/OrderHistory");
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 
-router.post('/order/payment/:id', async (req, res) => {
+router.post('/user/order/payment/:id', async (req, res) => {
     const msg = 'Payment done'
     const order_id = req.params.id
     const card_number = req.body.card_number
@@ -16,6 +16,9 @@ router.post('/order/payment/:id', async (req, res) => {
     const expiry_year = req.body.expiry_year
     try {
         const orderData = await Order.findById(order_id)
+        if(!orderData){
+            throw new Error(`Invalid order id`)
+        }
         // const amount = orderData.payable_amount
 
         const stripeCustomer = await stripe.customers.create({

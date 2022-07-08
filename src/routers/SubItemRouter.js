@@ -2,7 +2,8 @@ const express = require("express");
 const moment = require('moment')
 const SubItems = require("../models/SubItems");
 const router = express.Router()
-const auth = require('../middleware/Auth')
+const auth = require('../middleware/Auth');
+const Items = require("../models/Items");
 
 //add new subItem-type
 router.post('/add/subitem', auth,async (req, res) => {
@@ -10,7 +11,11 @@ router.post('/add/subitem', auth,async (req, res) => {
     const item_type = req.body.item_type.toUpperCase()
     const msg = 'SubItem created'
     try {
-        const already_type = await SubItems.findOne({ subItem_type, item_type })
+        const item = await Items.findOne({item_type})
+        if(!item){
+            throw new Error(`No item type found: ${item_type}`)
+        }
+        const already_type = await SubItems.findOne({ subItem_type,item_type })
         // const already_type = await SubItems.findOne({ subItem_type: { $regex: subItem_type, $options: 'i' }, item_type: { $regex: item_type, $options: 'i' } })
         if (already_type) {
             throw new Error(`Sub-item '${subItem_type}' already existing`)
@@ -24,7 +29,7 @@ router.post('/add/subitem', auth,async (req, res) => {
 })
 
 // get all subitems
-router.get('/get/subitems-type',auth, async (req, res) => {
+router.get('/subitems',auth, async (req, res) => {
     const msg = 'all subItems data'
     try {
         const subItems = await SubItems.find()
@@ -36,7 +41,7 @@ router.get('/get/subitems-type',auth, async (req, res) => {
 })
 
 // update subitems
-router.post('/update/subitem/',auth, async (req, res) => {
+router.patch('/subitem/',auth, async (req, res) => {
     const item_type = req.body.item_type.toUpperCase()
     const oldsubItem_type = req.body.oldsubItem_type.toUpperCase()
     const newsubItem_type = req.body.newsubItem_type
@@ -57,7 +62,7 @@ router.post('/update/subitem/',auth, async (req, res) => {
 })
 
 // delete subitems
-router.delete('/delete/subitem/:item/:type', auth,async (req, res) => {
+router.delete('/subitem/:item/:type', auth,async (req, res) => {
     const item_type = req.params.item.toUpperCase()
     const subItem_type = req.params.type.toUpperCase()
     const msg = 'subItem deleted'

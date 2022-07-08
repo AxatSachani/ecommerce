@@ -8,7 +8,7 @@ const auth = require("../middleware/Auth");
 
 
 // forget seller password
-router.post('/seller/generateOTP', auth,async (req, res) => {
+router.post('/seller/generateOTP', async (req, res) => {
     const emailId = req.body.emailId
     try {
         const seller = await Seller.findOne({ emailId })
@@ -33,7 +33,7 @@ router.post('/seller/generateOTP', auth,async (req, res) => {
     }
 })
 
-router.post('/seller/forget/password',auth, async (req, res) => {
+router.post('/seller/forget/password', async (req, res) => {
     const emailId = req.body.emailId
     const otp = req.body.otp
     const password = req.body.password
@@ -66,7 +66,7 @@ router.post('/seller/forget/password',auth, async (req, res) => {
 
 
 // forget user password
-router.post('/user/generateOTP', auth,async (req, res) => {
+router.post('/user/generateOTP', async (req, res) => {
     const emailId = req.body.emailId
     var id
     try {
@@ -92,7 +92,7 @@ router.post('/user/generateOTP', auth,async (req, res) => {
     }
 })
 
-router.post('/user/forget/password',auth, async (req, res) => {
+router.post('/user/forget/password', async (req, res) => {
     const emailId = req.body.emailId
     const otp = req.body.otp
     const password = req.body.password

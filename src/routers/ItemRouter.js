@@ -24,7 +24,7 @@ router.post('/add/item', auth, async (req, res) => {
 
 
 // get all items-types
-router.get('/get/items-types', auth, async (req, res) => {
+router.get('/items', auth, async (req, res) => {
     const msg = 'All itmes data'
     try {
         const items = await Items.find()
@@ -37,7 +37,7 @@ router.get('/get/items-types', auth, async (req, res) => {
 
 
 // update in items-types
-router.post('/update/item/', auth, async (req, res) => {
+router.patch('/item', auth, async (req, res) => {
     const olditem_type = req.body.olditem_type.toUpperCase()
     const item_type = req.body.newitem_type
     const createAt = moment(Date.now()).format('DD/MM/YYYY hh:mm a')
@@ -71,7 +71,7 @@ router.post('/update/item/', auth, async (req, res) => {
 
 
 // delete items 
-router.delete('/delete/item/:item', auth, async (req, res) => {
+router.delete('/item/:item', auth, async (req, res) => {
     const item_type = req.params.item.toUpperCase()
     const msg = ' Items deleted'
     try {

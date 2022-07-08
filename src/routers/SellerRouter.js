@@ -22,7 +22,7 @@ const upload = multer({
     }
 }).single('document')
 
-router.post('/request/account', async (req, res) => {
+router.post('/seller/account', async (req, res) => {
     const msg = 'new request create for seller account'
     // const document = req.file.document
     // console.log(document);
@@ -92,7 +92,7 @@ router.get('/seller/signout', auth, async (req, res) => {
 
 
 //update seller profile
-router.post('/update/seller/:id', auth, async (req, res) => {
+router.patch('/seller/:id', auth, async (req, res) => {
     const id = req.params.id
     const msg = 'data updated'
     const update_field = Object.keys(req.body)

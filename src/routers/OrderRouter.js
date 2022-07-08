@@ -10,16 +10,20 @@ const auth = require("../middleware/Auth");
 const router = express.Router()
 
 // place order
-router.post('/order', auth, async (req, res) => {
+router.post('/user/order', auth, async (req, res) => {
     const user_id = req.body.user_id
     const cart_id = req.body.cart_id
     const msg = 'Order Placed'
     var code = process.env.OFFER20OFF
     var total_amount = 0, status = 'Miss/Mrs.', user_name, couponCode, dicount, payable_amount, requireAmount
     try {
+    
 
         // user details
         const user = await User.findById(user_id)
+        if(!user){
+            throw new Error(`User not found`)
+        }
         if (user.gender == 'male') {
             status = 'Mr.'
         }
@@ -104,7 +108,7 @@ router.post('/order', auth, async (req, res) => {
 
 
 // generate invoice
-router.post('/order/invoice/:id', auth, async (req, res) => {
+router.post('/user/order/invoice/:id', auth, async (req, res) => {
     const msg = 'Invoice generate'
     const order_id = req.params.id
     var status = 'Mr.'
@@ -112,6 +116,9 @@ router.post('/order/invoice/:id', auth, async (req, res) => {
 
         // order data
         const orderData = await Order.findById(order_id)
+        if(!orderData){
+            throw new Error('invalid order id')
+        }
         const user_id = orderData.user_id
         var user_name = orderData.user_name
         const user_emailId = orderData.user_emailId
@@ -155,15 +162,15 @@ router.post('/order/invoice/:id', auth, async (req, res) => {
 
 
 // user order history
-router.get('/get/user/orders/:id', auth, async (req, res) => {
+router.get('/user-orders/:id', auth, async (req, res) => {
     const user_id = req.params.id
     const msg = 'User order history'
     try {
-        const user = User.findById({ user_id })
+        const user = await User.findById(user_id)
         if (!user) {
             throw new Error('User not found')
         }
-        const orders = await OrderHistory.find({ user_id }).select({_id:0,user_name:0,user_emailId:0,user_contact:0,})
+        const orders = await OrderHistory.find({ user_id }).select({ _id: 0, user_name: 0, user_emailId: 0, user_contact: 0, })
 
         res.status(200).send({ code: 200, message: msg, orders: orders })
     } catch (error) {

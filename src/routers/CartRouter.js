@@ -6,28 +6,35 @@ const Product = require('../models/Product');
 const User = require("../models/User");
 
 
-// add cart
-router.post('/add/cart', auth, async (req, res) => {
+// add user cart
+router.post('/user/add/cart', auth, async (req, res) => {
     const msg = 'Cart added'
     const user_id = req.body.user_id
     const product_id = req.body.product_id
     const product_size = req.body.product_size.toUpperCase()
-    var productDetails, seller_id, product_name, product_price, amount, cartData, cart, product_quantity = 1
+    var productDetails, seller_id, product_details, product_price, amount, cartData, cart, product_quantity = 1
     try {
+        const user = await User.findById(user_id)
+        if (!user) {
+            throw new Error(`User not found`)
+        }
         productDetails = await Product.findById(product_id)
+        if (!productDetails) {
+            throw new Error(`Product not found`)
+        }
         seller_id = productDetails.seller_id
-        product_name = productDetails.product_details.name
+        product_details = productDetails.product_details
         product_price = productDetails.product_price
         amount = product_price * product_quantity
 
         const cartCheck = await Cart.findOne({ user_id })
         if (!cartCheck) {
-            cartData = { user_id, products: { product_id, seller_id, product_name, product_quantity, product_size, product_price, amount } }
+            cartData = { user_id, products: { product_id, seller_id, product_details, product_quantity, product_size, product_price, amount } }
             cart = await Cart(cartData)
             await cart.save()
             res.status(201).send({ code: 201, message: msg, data: cart })
         } else {
-            cartData = { product_id, seller_id, product_name, product_quantity, product_size, product_price, amount }
+            cartData = { product_id, seller_id, product_details, product_quantity, product_size, product_price, amount }
             cartCheck.products.push(cartData)
             await cartCheck.save()
             res.status(201).send({ code: 201, message: msg, data: cartCheck })
@@ -39,11 +46,15 @@ router.post('/add/cart', auth, async (req, res) => {
 
 
 // update cart quantity-increase
-router.post('/update/cart/quantity-increase', auth, async (req, res) => {
+router.patch('/user/cart/quantity-increase', auth, async (req, res) => {
     const msg = 'Cart updated'
     const user_id = req.body.user_id
     const productCart_id = req.body.productCart_id
     try {
+        const user = await User.findById(user_id)
+        if (!user) {
+            throw new Error(`User not found`)
+        }
         var cart = await Cart.findOne({ user_id })
         for (var i = 0; i < cart.products.length; i++) {
             const product = cart.products[i]._id == productCart_id
@@ -62,11 +73,15 @@ router.post('/update/cart/quantity-increase', auth, async (req, res) => {
 
 
 // update cart quantity-decrease
-router.post('/update/cart/quantity-decrease', auth, async (req, res) => {
+router.patch('/user/cart/quantity-decrease', auth, async (req, res) => {
     const msg = 'Cart updated'
     const user_id = req.body.user_id
     const productCart_id = req.body.productCart_id
     try {
+        const user = await User.findById(user_id)
+        if (!user) {
+            throw new Error(`User not found`)
+        }
         var cart = await Cart.findOne({ user_id })
         for (var i = 0; i < cart.products.length; i++) {
             const product = cart.products[i]._id == productCart_id
@@ -85,7 +100,7 @@ router.post('/update/cart/quantity-decrease', auth, async (req, res) => {
 
 
 // delete product from cart
-router.delete('/delete/cart-product', auth, async (req, res) => {
+router.delete('/user/cart-product/delete', auth, async (req, res) => {
     const user_id = req.body.user_id
     const productCart_id = req.body.productCart_id
     const msg = 'Cart updated'
@@ -110,7 +125,7 @@ router.delete('/delete/cart-product', auth, async (req, res) => {
 
 
 // delete whole cart
-router.delete('/delete/cart', auth, async (req, res) => {
+router.delete('/user/cart/delete', auth, async (req, res) => {
     const user_id = req.body.user_id
     const msg = 'Cart deleted'
     try {
@@ -125,12 +140,16 @@ router.delete('/delete/cart', auth, async (req, res) => {
 })
 
 // get cartDetails by user 
-router.get('/get/user-cart/:id', auth, async (req, res) => {
+router.get('/user/cart/:id', auth, async (req, res) => {
     const msg = 'User Cart'
     const user_id = req.params.id
     try {
+        const user = await User.findById((user_id))
+        if (!user) {
+            throw new Error(`User not found`)
+        }
         const userCart = await Cart.findOne({ user_id }).select({ user_id: 0 })
-        res.status(200).send({ code: 200, message: msg, data: { user_id, userCart } })
+        res.status(200).send({ code: 200, message: msg, data: userCart })
     } catch (error) {
         res.status(404).send({ code: 404, message: error.message })
     }

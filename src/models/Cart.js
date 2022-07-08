@@ -15,8 +15,8 @@ const CartSchema = new mongoose.Schema({
         seller_id: {
             type: ObjectId
         },
-        product_name: {
-            type: String
+        product_details: {
+            type: Object
         },
         product_quantity: {
             type: Number
