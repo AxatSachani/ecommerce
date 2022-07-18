@@ -22,7 +22,10 @@ const AddProductSchema = new mongoose.Schema({
         type: String,
         uppercase:true
     }],
-    quantity: {
+    quantity:{
+        type:Number
+    },
+    livequantity: {
         type: Number
     },
     product_price: {

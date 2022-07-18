@@ -9,7 +9,6 @@ const SellerRejected = require("../models/SellerRejected");
 const auth = require("../middleware/Auth");
 
 
-// seller signup (create seller account)
 const upload = multer({
     limits: {
         fileSize: 8000000
@@ -22,6 +21,9 @@ const upload = multer({
     }
 }).single('document')
 
+
+
+// seller signup (create seller account)
 router.post('/seller/account', async (req, res) => {
     const msg = 'new request create for seller account'
     const emailId = req.body.emailId

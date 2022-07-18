@@ -4,10 +4,11 @@ const router = express.Router()
 const Payment = require('../models/Payment')
 const Order = require('../models/Order');
 const OrderHistory = require("../models/OrderHistory");
+const auth = require("../middleware/Auth");
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 
-router.post('/user/order/payment/:id', async (req, res) => {
+router.post('/user/order/payment/:id',auth,async (req, res) => {
     const msg = 'Payment done'
     const order_id = req.params.id
     const card_number = req.body.card_number

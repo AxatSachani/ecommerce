@@ -63,12 +63,12 @@ router.post('/user/order', auth, async (req, res) => {
 
         // check stock
         for (var i = 0; i < cart.products.length; i++) {
-            const cart_quantity = cart.products[i].product_quantity
+            const cart_livequantity = cart.products[i].product_livequantity
             const product = await Product.findById(cart.products[i].product_id)
-            const product_quantity = product.quantity
-            if (cart_quantity > product_quantity) {
-                throw new Error(`${product.product_details.name}: Available Qauntity : ${product_quantity}`)
-            } if (product_quantity == 0) {
+            const product_livequantity = product.livequantity
+            if (cart_livequantity > product_livequantity) {
+                throw new Error(`${product.product_details.name}: Available Qauntity : ${product_livequantity}`)
+            } if (product_livequantity == 0) {
                 throw new Error(`${product.product_details.name}: Out Of Stock`)
             }
         }
@@ -80,11 +80,11 @@ router.post('/user/order', auth, async (req, res) => {
         const order = await Order(OrderDetails)
         await order.save()
 
-        // increase quantity from products data
+        // increase livequantity from products data
         for (var i = 0; i < cart.products.length; i++) {
-            const cart_quantity = cart.products[i].product_quantity
+            const cart_livequantity = cart.products[i].product_livequantity
             const product = await Product.findById(cart.products[i].product_id)
-            product.quantity -= cart_quantity
+            product.livequantity -= cart_livequantity
             await product.save()
         }
 
@@ -141,10 +141,10 @@ router.post('/user/order/invoice/:id', auth, async (req, res) => {
         for (var i = 0; i < orderData.products.length; i++) {
             const product = await orderData.products[i]
             const product_name = product.product_name
-            const product_quantity = product.product_quantity
+            const product_livequantity = product.product_livequantity
             const product_price = product.product_price
             const amount = product.amount
-            const data = { product_name, product_quantity, product_price, amount }
+            const data = { product_name, product_livequantity, product_price, amount }
             productDetails.push(data)
         }
 

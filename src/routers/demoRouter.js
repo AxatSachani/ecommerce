@@ -30,10 +30,10 @@ router.post('/post/data', async (req, res) => {
 router.post('/mail', async (req, res) => {
     const courier = CourierClient({ authorizationToken: "pk_prod_CF62R0EEGY43FZG81AE995C4EDH7" });
 
-    const { requestId } = courier.send({
+    const  {requestId}  = courier.send({
         message: {
             to: {
-                email: "axatsachani2110@gmail.com",
+                email: "beactakshat@gmail.com",
             },
             template: "EVCR08MEWQ4F4CM7TFNXEV1YGAAY",
             data: {
@@ -42,7 +42,8 @@ router.post('/mail', async (req, res) => {
             },
         },
     });
-    res.send('done')
+    console.log(JSON.stringify(requestId));
+    res.send({done:requestId})
 })
 // Install with: npm install @trycourier/courier
 

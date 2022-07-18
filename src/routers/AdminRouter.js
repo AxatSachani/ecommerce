@@ -44,7 +44,7 @@ router.post('/admin/signin', async (req, res) => {
 })
 
 // get seller account create request
-router.get('/account/request', async (req, res) => {
+router.get('/account/request',auth, async (req, res) => {
     const msg = 'account request'
     var success
     console.log('admin-request');
@@ -80,7 +80,7 @@ router.get('/rejected/seller', auth, async (req, res) => {
 })
 
 // view seller profile
-router.get('/seller/profile/:id', async (req, res) => {
+router.get('/seller/profile/:id',auth, async (req, res) => {
     const msg = 'Seller profile'
     const seller_id = req.params.id
     var success

@@ -51,7 +51,7 @@ router.get('/products', auth, async (req, res) => {
 // product details
 router.get('/product/:id', auth, async (req, res) => {
     const msg = 'product details'
-    var alert_message = ''
+    var alert_message
     const product_id = req.params.id
     var success
     console.log('pro-deteils');
@@ -60,17 +60,18 @@ router.get('/product/:id', auth, async (req, res) => {
         if (!product) {
             throw new Error('product not found')
         }
-        const quentity = product.quantity
-        if (quentity <= 200 && quentity >= 100) {
+        const quantity = product.quantity
+        const livequantity = product.livequantity
+        if (livequantity <= quantity && livequantity >= (quantity*50)/100) {
             alert_message = `In Stock!`
         }
-        if (quentity < 100 && quentity > 30) {
-            alert_message = `Hurry up!`
+        if (livequantity < (quantity*50)/100 && livequantity > (quantity*15)/100) {
+            alert_message = `Hurry up! few left..`
         }
-        if (quentity < 30 && quentity > 0) {
-            alert_message = `Only ${quentity} left in stock`
+        if (livequantity < (quantity*15)/100 && livequantity > 0) {
+            alert_message = `Only ${livequantity} left in stock`
         }
-        if (quentity == 0) {
+        if (livequantity == 0) {
             alert_message = `Out of stock !`
         }
         success = true
@@ -83,9 +84,6 @@ router.get('/product/:id', auth, async (req, res) => {
 
 module.exports = router
 
-
 /*
-size:{
-
-}
+200 150
 */
