@@ -14,9 +14,11 @@ router.post('/user/order/payment/:id', async (req, res) => {
     const cvv_number = req.body.cvv_number
     const expiry_month = req.body.expiry_month
     const expiry_year = req.body.expiry_year
+    var success
+    console.log('payment');
     try {
         const orderData = await Order.findById(order_id)
-        if(!orderData){
+        if (!orderData) {
             throw new Error(`Invalid order id`)
         }
         // const amount = orderData.payable_amount
@@ -65,9 +67,11 @@ router.post('/user/order/payment/:id', async (req, res) => {
         await paymentDetails.save()
         await Order.findByIdAndUpdate(order_id, { payment: 'success' })
         await OrderHistory.findOneAndUpdate({ order_id }, { payment: 'success' })
-        res.status(200).send({ code: 200, message: msg, data: paymentDetails, redirectLink })
+        success = true
+        res.status(200).send({ code: 200, success: success, message: msg, data: paymentDetails, redirectLink })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
 

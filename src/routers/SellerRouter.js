@@ -24,15 +24,9 @@ const upload = multer({
 
 router.post('/seller/account', async (req, res) => {
     const msg = 'new request create for seller account'
-    // const document = req.file.document
-    // console.log(document);
-    // const first_name = req.body.first_name
-    // const last_name = req.body.last_name
     const emailId = req.body.emailId
-    // const contact_no = req.body.contact_no
-    // const password = req.body.password
-    // const data = { first_name, last_name, emailId, contact_no, password, document }
-    // console.log(data);
+    var success
+    console.log('seller-req');
     try {
         const seller = await Seller.findOne({ emailId })
         if (seller) {
@@ -44,25 +38,31 @@ router.post('/seller/account', async (req, res) => {
         }
         const sellerRequest = await SellerRequest(req.body)
         await sellerRequest.save()
-        res.status(201).send({ code: 201, message: msg, data: sellerRequest })
+        success = true
+        res.status(201).send({ code: 201, success: success, message: msg, data: sellerRequest })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
 
 
 
 // signin with seller ID
-router.get('/seller/signin', async (req, res) => {
+router.post('/seller/signin', async (req, res) => {
     const emailId = req.body.emailId
     const password = req.body.password
     const msg = 'seller signin successfully'
+    var success
+    console.log('seller-sigin');
     try {
         const seller = await Seller.findByCredentials(emailId, password)
         const token = await seller.generateAuthToken()
-        res.status(200).send({ code: 200, message: msg, data: seller, token })
+        success = true
+        res.status(200).send({ code: 200, success: success, message: msg, data: seller, token })
     } catch (error) {
-        res.status(404).send({ code: 404, message: error.message })
+        success = false
+        res.status(404).send({ code: 404, success: success, message: error.message })
     }
 })
 
@@ -71,6 +71,7 @@ router.get('/seller/signin', async (req, res) => {
 router.get('/seller/signout', auth, async (req, res) => {
     const msg = 'seller signout'
     const id = req.body.seller_id
+    var success
     try {
         const seller = await Seller.findById(id,)
         if (!seller) {
@@ -84,15 +85,17 @@ router.get('/seller/signout', auth, async (req, res) => {
             }
         }
         await seller.save()
-        res.status(200).send({ code: 200, message: msg })
+        success = true
+        res.status(200).send({ code: 200, success: success, message: msg })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
 
 
 //update seller profile
-router.patch('/seller/:id', auth, async (req, res) => {
+router.put('/seller/:id', auth, async (req, res) => {
     const id = req.params.id
     const msg = 'data updated'
     const update_field = Object.keys(req.body)
@@ -101,6 +104,8 @@ router.patch('/seller/:id', auth, async (req, res) => {
     if (!updateValidation) {
         throw new Error('check field')
     }
+    var success
+    console.log('seller-update');
     try {
         const seller = await Seller.findById(id)
         if (!seller) {
@@ -110,9 +115,11 @@ router.patch('/seller/:id', auth, async (req, res) => {
             seller[update_field] = req.body[update_field]
         })
         await seller.save()
-        res.status(200).send({ code: 200, message: msg, data: seller })
+        success = true
+        res.status(200).send({ code: 200, success: success, message: msg, data: seller })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
 

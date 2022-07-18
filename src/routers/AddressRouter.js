@@ -4,44 +4,58 @@ const router = express.Router()
 const { BillingAddress, ShippingAddress } = require('../models/Address');
 const User = require("../models/User");
 
-// update address
-router.patch('/user/billing-address', auth, async (req, res) => {
-    const user_id = req.body.user_id
+
+
+// update address(bill address)
+router.put('/user/billing-address/:id', auth, async (req, res) => {
+    const user_id = req.params.user_id
     const address = req.body.address
     const msg = 'Address updated'
+    var success
+    console.log('biil-address');
     try {
-        const user = await User.findByIdAndUpdate(user_id, { address })
-        if(!user){
+        const user = await User.findById(user_id)
+        if (!user) {
             throw new Error('User not found')
         }
-        const userBillAddress = await BillingAddress.findOne({ user_id })
+        user.address = address
+        await user.save()
+
+        const userBillAddress = await BillingAddress.findOne({user_id})
         userBillAddress.address = address
         await userBillAddress.save()
 
-        const userShippAddress = await ShippingAddress.findOne({ user_id })
+        const userShippAddress = await ShippingAddress.findOne({user_id})
         userShippAddress.address = address
         await userShippAddress.save()
-        res.status(200).send({ code: 200, message: msg })
+        success = true
+        res.status(200).send({ code: 200, success: success, message: msg })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
 
 
-
-router.patch('/user/shipping-address', auth, async (req, res) => {
-    const user_id = req.body.user_id
+// update address (shipp address)
+router.put('/user/shipping-address/:id', auth, async (req, res) => {
+    const user_id = req.params.user_id
     const msg = 'Address updated'
+    const address = req.body.address
+    var success
+    console.log('shipp-address');
     try {
-        const user = await ShippingAddress.findOne({ user_id })
-        if(!user){
+        const user = await ShippingAddress.findOne({user_id})
+        if (!user) {
             throw new Error('User not found')
         }
-        user.address = req.body.address
+        user.address = address
         await user.save()
-        res.status(200).send({ code: 200, message: msg })
+        success = true
+        res.status(200).send({ code: 200, success: success, message: msg })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
 

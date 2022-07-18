@@ -8,8 +8,10 @@ const Items = require("../models/Items");
 //add new subItem-type
 router.post('/add/subitem', auth,async (req, res) => {
     const subItem_type = req.body.subItem_type.toUpperCase()
-    const item_type = req.body.item_type.toUpperCase()
+    const item_type = req.body.item_type
     const msg = 'SubItem created'
+    var success
+    console.log('subitem-add');
     try {
         const item = await Items.findOne({item_type})
         if(!item){
@@ -22,31 +24,39 @@ router.post('/add/subitem', auth,async (req, res) => {
         }
         const subItem = await SubItems(req.body)
         await subItem.save()
-        res.status(201).send({ code: 201, message: msg, data: subItem })
+        success= true
+        res.status(201).send({ code: 201,success:success, message: msg, data: subItem })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success= false
+        res.status(400).send({ code: 400,success:success, message: error.message })
     }
 })
 
 // get all subitems
-router.get('/subitems',auth, async (req, res) => {
+router.get('/subitems/:item_type',auth, async (req, res) => {
     const msg = 'all subItems data'
+    const item_type= req.params.item_type
+    var success
+    console.log('subitem-get');
     try {
-        const subItems = await SubItems.find()
-        const count = await SubItems.find().countDocuments()
-        res.status(200).send({ code: 200, message: msg, totalItems: count, data: subItems })
+        const subItems = await SubItems.find({item_type}).select({_id:0,subItem_type:1})
+        success= true
+        res.status(200).send({ code: 200, success:success,message: msg, data: subItems })
     } catch (error) {
-        res.status(404).send({ code: 404, message: error.message })
+        success= false
+        res.status(404).send({ code: 404, success:success,message: error.message })
     }
 })
 
 // update subitems
-router.patch('/subitem/',auth, async (req, res) => {
+router.put('/subitem/',auth, async (req, res) => {
     const item_type = req.body.item_type.toUpperCase()
     const oldsubItem_type = req.body.oldsubItem_type.toUpperCase()
     const newsubItem_type = req.body.newsubItem_type
     const updateAt = moment(Date.now()).format('DD/MM/YYYY hh:mm a')
     const msg = 'subItem updated'
+    var success
+    console.log('subitem-update');
     try {
         const subItem = await SubItems.findOne({ subItem_type: oldsubItem_type, item_type: item_type })
         if(!subItem){
@@ -55,9 +65,11 @@ router.patch('/subitem/',auth, async (req, res) => {
         subItem.subItem_type =newsubItem_type
         subItem.updateAt = updateAt
         await subItem.save()
-        res.status(200).send({ code: 200, message: msg })
+        success= true
+        res.status(200).send({ code: 200,success:success, message: msg })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success= false
+        res.status(400).send({ code: 400,success:success, message: error.message })
     }
 })
 
@@ -66,14 +78,18 @@ router.delete('/subitem/:item/:type', auth,async (req, res) => {
     const item_type = req.params.item.toUpperCase()
     const subItem_type = req.params.type.toUpperCase()
     const msg = 'subItem deleted'
+    var success
+    console.log('subitem-del');
     try {
         const subItem = await SubItems.findOneAndDelete({ subItem_type, item_type })
         if (!subItem) {
             throw new Error(`No item found with type: '${item_type}','${subItem_type}' `)
         }
-        res.status(200).send({ code: 200, message: msg, data: subItem })
+        success= true
+        res.status(200).send({ code: 200,success:success, message: msg, data: subItem })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success= false
+        res.status(400).send({ code: 400,success:success, message: error.message })
     }
 })
 

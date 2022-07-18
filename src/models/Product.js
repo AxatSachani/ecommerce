@@ -29,6 +29,19 @@ const AddProductSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    delivery_option: [{
+        type: String
+    }],
+    details: {
+        type: String
+    },
+    features: [{
+        type: String
+    }],
+    tag: [{
+        type: String,
+        lowercase:true
+    }],
     subChild_type: {
         type: String,
         required: true,

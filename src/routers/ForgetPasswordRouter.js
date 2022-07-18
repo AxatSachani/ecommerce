@@ -10,6 +10,8 @@ const auth = require("../middleware/Auth");
 // forget seller password
 router.post('/seller/generateOTP', async (req, res) => {
     const emailId = req.body.emailId
+    var success
+    console.log('otp-seller');
     try {
         const seller = await Seller.findOne({ emailId })
         if (!seller) {
@@ -27,9 +29,11 @@ router.post('/seller/generateOTP', async (req, res) => {
         setTimeout(async () => {
             await ForgetPassword.findOneAndDelete({ emailId })
         }, 120000);
-        res.send({ message: 'OTP sent' })
+        success = true
+        res.send({ success: success, message: 'OTP sent' })
     } catch (error) {
-        res.send({ message: error.message })
+        success = false
+        res.send({ success: success, message: error.message })
     }
 })
 
@@ -37,6 +41,8 @@ router.post('/seller/forget/password', async (req, res) => {
     const emailId = req.body.emailId
     const otp = req.body.otp
     const password = req.body.password
+    var success
+    console.log('pass-seller');
     try {
         const seller = await Seller.findOne({ emailId })
         if (!seller) {
@@ -57,9 +63,11 @@ router.post('/seller/forget/password', async (req, res) => {
         if (otp != validOTP) {
             throw new Error('Invalid OTP')
         }
-        res.send({ message: 'Password changed.' })
+        success = true
+        res.send({ success: success, message: 'Password changed.' })
     } catch (error) {
-        res.send({ message: error.message })
+        success = false
+        res.send({ success: success, message: error.message })
     }
 })
 
@@ -69,6 +77,8 @@ router.post('/seller/forget/password', async (req, res) => {
 router.post('/user/generateOTP', async (req, res) => {
     const emailId = req.body.emailId
     var id
+    var success
+    console.log('otp-user');
     try {
         const user = await User.findOne({ emailId })
         if (!user) {
@@ -86,9 +96,11 @@ router.post('/user/generateOTP', async (req, res) => {
         setTimeout(async () => {
             await ForgetPassword.findOneAndDelete({ emailId })
         }, 120000);
-        res.send({ message: 'OTP sent' })
+        success = true
+        res.send({ success: success, message: 'OTP sent' })
     } catch (error) {
-        res.send({ message: error.message })
+        success = false
+        res.send({ success: success, message: error.message })
     }
 })
 
@@ -96,6 +108,8 @@ router.post('/user/forget/password', async (req, res) => {
     const emailId = req.body.emailId
     const otp = req.body.otp
     const password = req.body.password
+    var success
+    console.log('pass-user');
     try {
         const user = await User.findOne({ emailId })
         if (!user) {
@@ -116,9 +130,11 @@ router.post('/user/forget/password', async (req, res) => {
         if (otp != validOTP) {
             throw new Error('Invalid OTP')
         }
-        res.send({ message: 'Password changed.' })
+        success = true
+        res.send({ success: success, message: 'Password changed.' })
     } catch (error) {
-        res.send({ message: error.message })
+        success = false
+        res.send({ success: success, message: error.message })
     }
 })
 

@@ -15,13 +15,12 @@ router.post('/user/order', auth, async (req, res) => {
     const cart_id = req.body.cart_id
     const msg = 'Order Placed'
     var code = process.env.OFFER20OFF
-    var total_amount = 0, status = 'Miss/Mrs.', user_name, couponCode, dicount, payable_amount, requireAmount
+    var total_amount = 0, status = 'Miss/Mrs.', user_name, couponCode, dicount, payable_amount, requireAmount, success
+    console.log('order-place');
     try {
-    
-
         // user details
         const user = await User.findById(user_id)
-        if(!user){
+        if (!user) {
             throw new Error(`User not found`)
         }
         if (user.gender == 'male') {
@@ -62,7 +61,6 @@ router.post('/user/order', auth, async (req, res) => {
             }
         }
 
-
         // check stock
         for (var i = 0; i < cart.products.length; i++) {
             const cart_quantity = cart.products[i].product_quantity
@@ -98,10 +96,11 @@ router.post('/user/order', auth, async (req, res) => {
         const OrderHistoryDetails = { order_id, user_id, user_name, user_emailId, user_contact, products, total_amount, couponCode, dicount, payable_amount, billAddress, shippAddress }
         await OrderHistory(OrderHistoryDetails).save()
 
-
-        res.status(201).send({ code: 201, message: msg, data: order })
+        success = true
+        res.status(201).send({ code: 201, success: success, message: msg, data: order })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
 
@@ -112,11 +111,13 @@ router.post('/user/order/invoice/:id', auth, async (req, res) => {
     const msg = 'Invoice generate'
     const order_id = req.params.id
     var status = 'Mr.'
+    var success
+    console.log('order-invoice');
     try {
 
         // order data
         const orderData = await Order.findById(order_id)
-        if(!orderData){
+        if (!orderData) {
             throw new Error('invalid order id')
         }
         const user_id = orderData.user_id
@@ -154,9 +155,11 @@ router.post('/user/order/invoice/:id', auth, async (req, res) => {
         } else {
             throw new Error('Payment not succesed')
         }
-        res.status(201).send({ code: 201, message: msg, data: invoice })
+        success = true
+        res.status(201).send({ code: 201, success: success, message: msg, data: invoice })
     } catch (error) {
-        res.status(404).send({ code: 404, message: error.message })
+        success = false
+        res.status(404).send({ code: 404, success: success, message: error.message })
     }
 })
 
@@ -165,6 +168,8 @@ router.post('/user/order/invoice/:id', auth, async (req, res) => {
 router.get('/user-orders/:id', auth, async (req, res) => {
     const user_id = req.params.id
     const msg = 'User order history'
+    var success
+    console.log('order-user');
     try {
         const user = await User.findById(user_id)
         if (!user) {
@@ -172,9 +177,11 @@ router.get('/user-orders/:id', auth, async (req, res) => {
         }
         const orders = await OrderHistory.find({ user_id }).select({ _id: 0, user_name: 0, user_emailId: 0, user_contact: 0, })
 
-        res.status(200).send({ code: 200, message: msg, orders: orders })
+        success = true
+        res.status(200).send({ code: 200, success: success, message: msg, orders: orders })
     } catch (error) {
-        res.status(404).send({ code: 404, message: error.message })
+        success = false
+        res.status(404).send({ code: 404, success: success, message: error.message })
     }
 })
 

@@ -13,6 +13,8 @@ router.post('/user/add/cart', auth, async (req, res) => {
     const product_id = req.body.product_id
     const product_size = req.body.product_size.toUpperCase()
     var productDetails, seller_id, product_details, product_price, amount, cartData, cart, product_quantity = 1
+    var success
+    console.log('cart-add');
     try {
         const user = await User.findById(user_id)
         if (!user) {
@@ -37,19 +39,23 @@ router.post('/user/add/cart', auth, async (req, res) => {
             cartData = { product_id, seller_id, product_details, product_quantity, product_size, product_price, amount }
             cartCheck.products.push(cartData)
             await cartCheck.save()
-            res.status(201).send({ code: 201, message: msg, data: cartCheck })
+            success = true
+            res.status(201).send({ code: 201,success:success, message: msg, data: cartCheck })
         }
     } catch (error) {
-        res.status(404).send({ code: 400, message: error.message })
+        success = false
+        res.status(404).send({ code: 400,success:success, message: error.message })
     }
 })
 
 
 // update cart quantity-increase
-router.patch('/user/cart/quantity-increase', auth, async (req, res) => {
+router.put('/user/cart/quantity-increase', auth, async (req, res) => {
     const msg = 'Cart updated'
     const user_id = req.body.user_id
     const productCart_id = req.body.productCart_id
+    var success
+    console.log('cart-qua-+');
     try {
         const user = await User.findById(user_id)
         if (!user) {
@@ -65,18 +71,22 @@ router.patch('/user/cart/quantity-increase', auth, async (req, res) => {
             }
         }
         await cart.save()
-        res.status(200).send({ code: 200, message: msg, data: cart })
+        success = true
+        res.status(200).send({ code: 200,success:success, message: msg, data: cart })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400,success:success, message: error.message })
     }
 })
 
 
 // update cart quantity-decrease
-router.patch('/user/cart/quantity-decrease', auth, async (req, res) => {
+router.put('/user/cart/quantity-decrease', auth, async (req, res) => {
     const msg = 'Cart updated'
     const user_id = req.body.user_id
     const productCart_id = req.body.productCart_id
+    var success
+    console.log('cart-qua--');
     try {
         const user = await User.findById(user_id)
         if (!user) {
@@ -92,9 +102,11 @@ router.patch('/user/cart/quantity-decrease', auth, async (req, res) => {
             }
         }
         await cart.save()
-        res.status(201).send({ code: 201, message: msg, data: cart })
+        success = true
+        res.status(201).send({ code: 201,success:success, message: msg, data: cart })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400, success:success,message: error.message })
     }
 })
 
@@ -104,6 +116,8 @@ router.delete('/user/cart-product/delete', auth, async (req, res) => {
     const user_id = req.body.user_id
     const productCart_id = req.body.productCart_id
     const msg = 'Cart updated'
+    var success
+    console.log('cart-pro-del');
     try {
         const cart = await Cart.findOne({ user_id })
         if (!cart) {
@@ -117,9 +131,11 @@ router.delete('/user/cart-product/delete', auth, async (req, res) => {
             }
         }
         await cart.save()
-        res.status(200).send({ code: 200, message: msg, data: cart })
+        success = true
+        res.status(200).send({ code: 200,success:success, message: msg, data: cart })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400,success:success, message: error.message })
     }
 })
 
@@ -128,14 +144,18 @@ router.delete('/user/cart-product/delete', auth, async (req, res) => {
 router.delete('/user/cart/delete', auth, async (req, res) => {
     const user_id = req.body.user_id
     const msg = 'Cart deleted'
+    var success
+    console.log('cart-del');
     try {
         const cart = await Cart.findOneAndDelete({ user_id })
         if (!cart) {
             throw new Error('Cart not found')
         }
-        res.status(200).send({ code: 200, message: msg })
+        success = true
+        res.status(200).send({ code: 200,success:success, message: msg })
     } catch (error) {
-        res.status(404).send({ code: 404, message: error.message })
+        success = false
+        res.status(404).send({ code: 404,success:success, message: error.message })
     }
 })
 
@@ -143,15 +163,19 @@ router.delete('/user/cart/delete', auth, async (req, res) => {
 router.get('/user/cart/:id', auth, async (req, res) => {
     const msg = 'User Cart'
     const user_id = req.params.id
+    var success
+    console.log('cart');
     try {
         const user = await User.findById((user_id))
         if (!user) {
             throw new Error(`User not found`)
         }
         const userCart = await Cart.findOne({ user_id }).select({ user_id: 0 })
-        res.status(200).send({ code: 200, message: msg, data: userCart })
+        success = true
+        res.status(200).send({ code: 200,success:success, message: msg, data: userCart })
     } catch (error) {
-        res.status(404).send({ code: 404, message: error.message })
+        success = false
+        res.status(404).send({ code: 404,success:success, message: error.message })
     }
 })
 

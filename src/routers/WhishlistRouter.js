@@ -12,6 +12,8 @@ router.post('/add/whishlist', auth, async (req, res) => {
     const user_id = req.body.user_id
     const product_id = req.body.product_id
     const msg = 'Whishilist added'
+    var success
+    console.log('whish-add');
     try {
         const user = await User.findById(user_id)
         if (!user) {
@@ -27,9 +29,11 @@ router.post('/add/whishlist', auth, async (req, res) => {
         const whishListDetails = { user_id, products: { product_id, seller_id, product_name, product_price } }
         const whishlist = await Whishlist(whishListDetails)
         await whishlist.save()
-        res.status(201).send({ code: 201, message: msg, data: whishlist })
+        success = true
+        res.status(201).send({ code: 201, success: success, message: msg, data: whishlist })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
 
@@ -39,15 +43,19 @@ router.post('/add/whishlist', auth, async (req, res) => {
 router.delete('/user/whishlist/delete/:id', auth, async (req, res) => {
     const msg = 'Whishlist deleted'
     const whishlist_id = req.params.id
+    var success
+    console.log('whish-del');
     try {
         const whishlist = await Whishlist.findById(whishlist_id)
         if (!whishlist) {
             throw new Error('invalid whishlist id')
         }
         await w.delete()
-        res.status(200).send({ code: 200, message: msg })
+        success = true
+        res.status(200).send({ code: 200, success: success, message: msg })
     } catch (error) {
-        res.status(404).send({ code: 404, message: error.message })
+        success = false
+        res.status(404).send({ code: 404, success: success, message: error.message })
     }
 })
 
@@ -55,21 +63,21 @@ router.delete('/user/whishlist/delete/:id', auth, async (req, res) => {
 router.get('/user/whishlist/:id', auth, async (req, res) => {
     const msg = 'User Whishlist'
     const user_id = req.params.id
+    var success
+    console.log('whish-get');
     try {
         const user = await User.findById(user_id)
         if (!user) {
             throw new Error('user not found')
         }
         const whishlist = await Whishlist.find({ user_id }).select({ user_id: 0 })
-        res.status(200).send({ code: 200, message: msg, data: whishlist })
+        success = true
+        res.status(200).send({ code: 200, success: success, message: msg, data: whishlist })
     } catch (error) {
-        res.status(404).send({ code: 404, message: error.message })
+        success = false
+        res.status(404).send({ code: 404, success: success, message: error.message })
     }
 })
-
-
-
-
 
 
 

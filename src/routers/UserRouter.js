@@ -3,56 +3,53 @@ const router = express.Router()
 const User = require('../models/User')
 const { BillingAddress, ShippingAddress } = require('../models/Address');
 const auth = require("../middleware/Auth");
-
-
+const moment = require('moment')
 // user Signup
 router.post('/user/signup', async (req, res) => {
     const msg = 'User created'
-    const first_name = req.body.first_name
-    const last_name = req.body.last_name
-    const emailId = req.body.emailId
-    const contact_no = req.body.contact_no
-    const gender = req.body.gender
-    const address = req.body.address
-    const password = req.body.password
-
-    const data = { first_name, last_name, emailId, contact_no, gender, address, password }
+    console.log(`user/signup`);
+    var success
     try {
-        console.log('http://192.168.29.2:3000/user/signup');
         const user = await User(req.body)
-        console.log('user', data);
         const token = await user.generateAuthToken()
-        console.log('token', token);
         const addressDetails = { user_id: user._id, address: req.body.address }
         await user.save()
-        console.log('save');
         await BillingAddress(addressDetails).save()
         await ShippingAddress(addressDetails).save()
-        res.status(200).send({ code: 201, message: msg, data: user, token })
+        success = true
+        res.status(200).send({ code: 201, success: success, message: msg, data: user, token })
     } catch (error) {
-        console.log('unformatted');
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
 
 //user signin
-router.get('/user/signin', async (req, res) => {
+router.post('/user/signin', async (req, res) => {
     const msg = 'user signin'
+    console.log(`user/signin`);
+    var success
     try {
+        console.log(req.body.emailId);
+        console.log(req.body.password);
         const user = await User.findByCredentials(req.body.emailId, req.body.password)
         const token = await user.generateAuthToken()
-        res.status(200).send({ code: 200, message: msg, data: user, token })
-
+        success = true
+        res.status(200).send({ code: 200, success: success, message: msg, data: user, token })
     } catch (error) {
-        res.status(404).send({ code: 404, message: error.message })
+        success = false
+        res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
 
 
+
 // update user details
-router.patch('/user/:id', auth, async (req, res) => {
+router.put('/user/:id', auth, async (req, res) => {
     const msg = 'User updated'
     const id = req.params.id
+    var success
+    console.log('user-update');
     try {
         const update_fields = Object.keys(req.body)
         const allowUpdate = ['first_name', 'last_name', 'emailId', 'contact_no', 'alterContact_no', 'password']
@@ -60,7 +57,6 @@ router.patch('/user/:id', auth, async (req, res) => {
         if (!updateValidation) {
             throw new Error('Invalid update')
         }
-
         const user = await User.findById(id)
         if (!user) {
             throw new Error('User not found')
@@ -69,9 +65,11 @@ router.patch('/user/:id', auth, async (req, res) => {
             user[update_fields] = req.body[update_fields]
         })
         await user.save()
-        res.status(200).send({ code: 200, message: msg, data: user })
+        success = true
+        res.status(200).send({ code: 200,success: success, message: msg, data: user })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400,success:success, message: error.message })
     }
 })
 
@@ -79,6 +77,8 @@ router.patch('/user/:id', auth, async (req, res) => {
 router.get('/user/signout', auth, async (req, res) => {
     const msg = 'user signout'
     const id = req.body.user_id
+    var success 
+    console.log('user-out');
     try {
         const user = await User.findById(id,)
         if (!user) {
@@ -92,9 +92,11 @@ router.get('/user/signout', auth, async (req, res) => {
             }
         }
         await user.save()
-        res.status(200).send({ code: 200, message: msg })
+        success = true
+        res.status(200).send({ code: 200,success:success, message: msg })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success = false
+        res.status(400).send({ code: 400,success:success, message: error.message })
     }
 })
 

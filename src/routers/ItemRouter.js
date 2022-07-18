@@ -8,6 +8,8 @@ const auth = require('../middleware/Auth')
 //Add new Item type
 router.post('/add/item', auth, async (req, res) => {
     const msg = 'Item created'
+    var success
+    console.log('item-add');
     try {
         const item_type = req.body.item_type.toUpperCase()
         const already_type = await Items.findOne({ item_type })
@@ -16,9 +18,11 @@ router.post('/add/item', auth, async (req, res) => {
         }
         const item = await Items(req.body)
         await item.save()
-        res.status(201).send({ code: 201, message: msg, data: item })
+        success =true
+        res.status(201).send({ code: 201,success:success, message: msg, data: item })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success =false
+        res.status(400).send({ code: 400,success:success, message: error.message })
     }
 })
 
@@ -26,22 +30,27 @@ router.post('/add/item', auth, async (req, res) => {
 // get all items-types
 router.get('/items', auth, async (req, res) => {
     const msg = 'All itmes data'
+    var success
+    console.log('item-get');
     try {
-        const items = await Items.find()
-        const count = await Items.find().countDocuments()
-        res.status(200).send({ code: 200, message: msg, totalItems: count, data: items })
+        const items = await Items.find().select({_id:0,item_type:1})
+        success =true
+        res.status(200).send({ code: 200, success:success,message: msg, data: items })
     } catch (error) {
-        res.status(404).send({ code: 404, message: error.message })
+        success =false
+        res.status(404).send({ code: 404,success:success, message: error.message })
     }
 })
 
 
 // update in items-types
-router.patch('/item', auth, async (req, res) => {
+router.put('/item', auth, async (req, res) => {
     const olditem_type = req.body.olditem_type.toUpperCase()
     const item_type = req.body.newitem_type
     const createAt = moment(Date.now()).format('DD/MM/YYYY hh:mm a')
     const msg = 'item-type updated'
+    var success
+    console.log('item-update');
     try {
         const item = await Items.findOne({ item_type: olditem_type })
         if (!item) {
@@ -52,9 +61,11 @@ router.patch('/item', auth, async (req, res) => {
         await item.save()
         // await Items.findOneAndUpdate(, { item_type, createAt })
 
-        res.status(200).send({ code: 200, message: msg })
+        success =true
+        res.status(200).send({ code: 200,success:success, message: msg })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success =false
+        res.status(400).send({ code: 400, success:success,message: error.message })
     }
 })
 
@@ -74,14 +85,18 @@ router.patch('/item', auth, async (req, res) => {
 router.delete('/item/:item', auth, async (req, res) => {
     const item_type = req.params.item.toUpperCase()
     const msg = ' Items deleted'
+    var success
+    console.log('item-del');
     try {
         const item = await Items.findOneAndDelete({ item_type })
         if (!item) {
             throw new Error(`No item found with type: '${item_type}' `)
         }
-        res.status(200).send({ code: 200, message: msg, data: item })
+        success =true
+        res.status(200).send({ code: 200,success:success, message: msg, data: item })
     } catch (error) {
-        res.status(400).send({ code: 400, message: error.message })
+        success =false
+        res.status(400).send({ code: 400,success:success, message: error.message })
     }
 })
 

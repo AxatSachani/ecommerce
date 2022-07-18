@@ -30,12 +30,10 @@ const UserSchema = new mongoose.Schema({
     contact_no: {
         type: String,
         required: true,
-        // trim: true
     },
     gender: {
         type: String,
         required: true,
-        // trim: true
     },
     address: {
         type: String,
@@ -89,11 +87,11 @@ UserSchema.pre('save', async function (next) {
 UserSchema.statics.findByCredentials = async function (emailId, password) {
     const user = await User.findOne({ emailId })
     if (!user) {
-        throw new Error('User not found')
+        throw  Error('User not found')
     }
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
-        throw new Error('Invalid Password')
+        throw  Error('Invalid Password')
     }
     return user
 }
