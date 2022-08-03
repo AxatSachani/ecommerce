@@ -7,7 +7,6 @@ const SubChildSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        uppercase: true
     },
     subItem_type: {
         type: String,
@@ -19,7 +18,6 @@ const SubChildSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        uppercase: true
     },
     addedBy: {
         type: ObjectId,

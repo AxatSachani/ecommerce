@@ -17,13 +17,19 @@ const AddProductSchema = new mongoose.Schema({
             type: String,
             required: true
         },
+        banner: {
+            type: String
+        }
     },
+    image: [{
+        type: String
+    }],
     size: [{
         type: String,
-        uppercase:true
+        uppercase: true
     }],
-    quantity:{
-        type:Number
+    quantity: {
+        type: Number
     },
     livequantity: {
         type: Number
@@ -48,7 +54,6 @@ const AddProductSchema = new mongoose.Schema({
     subChild_type: {
         type: String,
         required: true,
-        uppercase: true
     },
     subItem_type: {
         type: String,
@@ -58,14 +63,20 @@ const AddProductSchema = new mongoose.Schema({
     item_type: {
         type: String,
         required: true,
-        uppercase: true
     }
 
-    //sellerID, product_details, product_price, live_quantity, subChild_type, sub_category, item_category
-
-    // name , description ,size, 
-
 })
+
+
+
+
+// filter response data
+AddProductSchema.methods.toJSON = function () {
+    const product = this
+    const productData = product.toObject()
+    delete productData.__v
+    return productData
+}
 
 const Product = mongoose.model('Product', AddProductSchema)
 module.exports = Product

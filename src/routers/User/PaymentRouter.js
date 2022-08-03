@@ -1,10 +1,10 @@
 const express = require("express");
 const moment = require('moment')
 const router = express.Router()
-const Payment = require('../models/Payment')
-const Order = require('../models/Order');
-const OrderHistory = require("../models/OrderHistory");
-const auth = require("../middleware/Auth");
+const Payment = require('../../models/Payment')
+const Order = require('../../models/Order');
+const OrderHistory = require("../../models/OrderHistory");
+const auth = require("../../middleware/Auth");
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 

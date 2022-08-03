@@ -1,29 +1,29 @@
 const { ObjectId } = require("mongodb");
 const mongoose = require("mongoose");
 
-const BillingAddressSchema = new mongoose.Schema({
+const AddressSchema = new mongoose.Schema({
     user_id: {
         type: ObjectId
     },
     address: {
-        type: String
-    }
-
-})
-const BillingAddress = mongoose.model('BillingAddress',BillingAddressSchema)
-// module.exports = 
-
-
-const ShippingAddressSchema = new mongoose.Schema({
-    user_id: {
-        type: ObjectId
+        default:"",
+        address: {
+            type: String,
+        },
+        pincode: {
+            type: String,
+        },
+        locality: {
+            type: String,
+        },
+        city: {
+            type: String,
+        },
+        state: {
+            type: String,
+        }
     },
-    address: {
-        type: String
-    }
 })
 
-const ShippingAddress = mongoose.model('ShippingAddress',ShippingAddressSchema)
-module.exports = {
-    BillingAddress,
-    ShippingAddress}
+const Address = mongoose.model('Address',AddressSchema)
+module.exports = Address

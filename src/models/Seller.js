@@ -3,6 +3,7 @@ const validator = require('validator')
 const bcrypt = require('bcrypt');
 const { ObjectId } = require("mongodb");
 const jwt = require('jsonwebtoken')
+const moment = require('moment')
 
 const SellerSchema = new mongoose.Schema({
     _id: {
@@ -18,6 +19,29 @@ const SellerSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
+    },
+    store_name: {
+        type: String
+    },
+    address: {
+        address: {
+            type: String,
+        },
+        pincode: {
+            type: String,
+        },
+        locality: {
+            type: String,
+        },
+        city: {
+            type: String,
+        },
+        state: {
+            type: String,
+        }
+    },
+    document: {
+        type: Array
     },
     emailId: {
         type: String,
@@ -49,6 +73,14 @@ const SellerSchema = new mongoose.Schema({
             }
         }
     },
+
+    remark: {
+        type: String
+    },
+    date: {
+        type: String,
+        default: moment(Date.now()).format('DD/MM/YYYY hh:mm a')
+    },
     tokens: [{
         token: {
             type: String
@@ -63,6 +95,7 @@ SellerSchema.methods.toJSON = function () {
     const sellerData = seller.toObject()
     delete sellerData.password
     delete sellerData.tokens
+    delete sellerData.__v
     return sellerData
 }
 

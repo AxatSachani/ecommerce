@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router()
-const User = require('../models/User')
-const { BillingAddress, ShippingAddress } = require('../models/Address');
-const auth = require("../middleware/Auth");
+const User = require('../../models/User')
+const Address = require('../../models/Address');
+const auth = require("../../middleware/Auth");
 const moment = require('moment')
 // user Signup
 router.post('/user/signup', async (req, res) => {
@@ -11,11 +11,12 @@ router.post('/user/signup', async (req, res) => {
     var success
     try {
         const user = await User(req.body)
+        console.log(req.body.address);
         const token = await user.generateAuthToken()
         const addressDetails = { user_id: user._id, address: req.body.address }
         await user.save()
-        await BillingAddress(addressDetails).save()
-        await ShippingAddress(addressDetails).save()
+        console.log(addressDetails);
+        await Address(addressDetails).save()
         success = true
         res.status(200).send({ code: 201, success: success, message: msg, data: user, token })
     } catch (error) {
@@ -34,6 +35,7 @@ router.post('/user/signin', async (req, res) => {
         console.log(req.body.password);
         const user = await User.findByCredentials(req.body.emailId, req.body.password)
         const token = await user.generateAuthToken()
+
         success = true
         res.status(200).send({ code: 200, success: success, message: msg, data: user, token })
     } catch (error) {
@@ -52,7 +54,7 @@ router.put('/user/:id', auth, async (req, res) => {
     console.log('user-update');
     try {
         const update_fields = Object.keys(req.body)
-        const allowUpdate = ['first_name', 'last_name', 'emailId', 'contact_no', 'alterContact_no', 'password']
+        const allowUpdate = ['first_name', 'last_name', 'emailId', 'contact_no','DOB', 'alterContact_no','gender','address']
         const updateValidation = update_fields.every((update_fields) => allowUpdate.includes(update_fields))
         if (!updateValidation) {
             throw new Error('Invalid update')

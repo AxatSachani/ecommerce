@@ -40,28 +40,44 @@ const OrderSchema = new mongoose.Schema({
     total_amount: {
         type: Number
     },
-    coupon_code:{
-        type:String
-    },
-    dicount:{
-        type:Number
-    },
-    payable_amount:{
-        type:Number
-    },
-    billAddress: {
+    coupon_code: {
         type: String
     },
-    shippAddress: {
-        type: String
+    dicount: {
+        type: Number
     },
-    order_time:{
-        type:String,
-        default:moment(Date.now()).format('DD/MM/YYYY hh:mm A')
+    payable_amount: {
+        type: Number
     },
-    payment:{
-        type:String,
-        default:'pending '
+    address: {
+        address: {
+            type: String,
+            required: true,
+        },
+        pincode: {
+            type: String,
+            required: true,
+        },
+        locality: {
+            type: String,
+            required: true,
+        },
+        city: {
+            type: String,
+            required: true,
+        },
+        state: {
+            type: String,
+            required: true,
+        }
+    },
+    order_time: {
+        type: String,
+        // default:moment(Date.now()).format('DD/MM/YYYY hh:mm A')
+    },
+    payment: {
+        type: String,
+        default: 'pending '
     }
 
 })

@@ -15,8 +15,14 @@ const CartSchema = new mongoose.Schema({
         seller_id: {
             type: ObjectId
         },
-        product_details: {
-            type: Object
+        product_brand: {
+            type: String
+        },
+        product_name: {
+            type: String
+        },
+        product_banner: {
+            type: String
         },
         product_quantity: {
             type: Number
@@ -31,6 +37,10 @@ const CartSchema = new mongoose.Schema({
             type: Number
         }
     }],
+    total_amount:{
+        type:Number,
+        default:0
+    }
 
 
 

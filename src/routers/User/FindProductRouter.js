@@ -1,6 +1,6 @@
 const express = require('express')
-const auth = require('../middleware/Auth')
-const Product = require('../models/Product')
+const auth = require('../../middleware/Auth')
+const Product = require('../../models/Product')
 const router = express.Router()
 
 // find products from params
@@ -56,5 +56,6 @@ router.get('/products/', auth, async (req, res) => {
         res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
+
 
 module.exports = router

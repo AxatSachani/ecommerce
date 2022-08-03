@@ -39,11 +39,27 @@ const InvoiceSchema = new mongoose.Schema({
     payable_amount: {
         type: Number
     },
-    billAddress: {
-        type: String
-    },
-    shippAddress: {
-        type: String
+    address: {
+        address: {
+            type: String,
+            required: true,
+        },
+        pincode: {
+            type: String,
+            required: true,
+        },
+        locality: {
+            type: String,
+            required: true,
+        },
+        city: {
+            type: String,
+            required: true,
+        },
+        state: {
+            type: String,
+            required: true,
+        }
     },
     order_time: {
         type: String,

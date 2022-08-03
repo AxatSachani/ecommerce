@@ -1,19 +1,20 @@
 const express = require("express");
-const auth = require("../middleware/Auth");
+const auth = require("../../middleware/Auth");
 const router = express.Router()
-const Cart = require('../models/Cart')
-const Product = require('../models/Product');
-const User = require("../models/User");
+const Cart = require('../../models/Cart');
+const Coupon = require("../../models/Coupon");
+const Product = require('../../models/Product');
+const User = require("../../models/User");
 // require('dotenv').config()
 
 
-// add user cart
+// add user cart 
 router.post('/user/add/cart', auth, async (req, res) => {
     const msg = 'Cart added'
     const user_id = req.body.user_id
     const product_id = req.body.product_id
     const product_size = req.body.product_size.toUpperCase()
-    var productDetails, seller_id, product_details, product_price, amount, cartData, cart, product_quantity = 1
+    var productDetails, seller_id, product_brand, product_name, product_banner, product_price, amount, cartData, cart, product_quantity = 1
     var success
     console.log('cart-add');
     try {
@@ -26,18 +27,21 @@ router.post('/user/add/cart', auth, async (req, res) => {
             throw new Error(`Product not found`)
         }
         seller_id = productDetails.seller_id
-        product_details = productDetails.product_details
+        product_brand = productDetails.product_details.name
+        product_name = productDetails.product_details.description
+        product_banner = productDetails.product_details.banner
         product_price = productDetails.product_price
         amount = product_price * product_quantity
 
+
         const cartCheck = await Cart.findOne({ user_id })
         if (!cartCheck) {
-            cartData = { user_id, products: { product_id, seller_id, product_details, product_quantity, product_size, product_price, amount } }
+            cartData = { user_id, products: { product_id, seller_id, product_brand, product_name, product_banner, product_quantity, product_size, product_price, amount } }
             cart = await Cart(cartData)
             await cart.save()
             res.status(201).send({ code: 201, message: msg, data: cart })
         } else {
-            cartData = { product_id, seller_id, product_details, product_quantity, product_size, product_price, amount }
+            cartData = { product_id, seller_id, product_brand, product_name, product_banner, product_quantity, product_size, product_price, amount }
             cartCheck.products.push(cartData)
             await cartCheck.save()
             success = true
@@ -180,14 +184,21 @@ router.get('/user/cart/:id', auth, async (req, res) => {
     }
 })
 
+// var num3 = 00.toFixed(2);
+// console.log(num3);
+
+
+// var a = process.env.OFFER20OFF.split(', ')
+// console.log(a);
+// console.log(a[1]);
+
 
 
 // check out details
 router.post('/user/cart/checkout', auth, async (req, res) => {
-    var success, subtotal = 0, total = 0, dicount = 0
+    var success, subtotal = 0, total = 0, discount = 00
     const user_id = req.body.user_id
     const couponCode = req.body.code
-    const code = process.env.OFFER20OFF
     const msg = 'checkout data'
     try {
         const checkout = await Cart.findOne({ user_id })
@@ -198,21 +209,28 @@ router.post('/user/cart/checkout', auth, async (req, res) => {
             subtotal += checkout.products[i].amount
         }
         total = subtotal
-
         if (couponCode) {
-            if (code.indexOf(couponCode.toUpperCase()) !== -1) {
-                if (10000 < subtotal) {
-                    dicount = (subtotal * 20) / 100
-                    total = subtotal - dicount
+            const coupon = await Coupon.findOne({ coupon_code: couponCode })            //.select({ coupon_type: 1, discount: 1, condition: 1 })
+            if (coupon.coupon_type == 'Flat Discount') {
+                if (coupon.condition < subtotal) {
+                    discount = coupon.discount
+                    total = subtotal - discount
                 } else {
-                    requireAmount = 10000 - subtotal
-                    throw new Error(`Amount atleast 10000 for code: ${couponCode}, Required ${requireAmount} more for this offer`)
+                    requireAmount = coupon.condition - subtotal
+                    throw new Error(`${requireAmount} more require`)
                 }
-            } else {
-                throw new Error(`Invalid coupon code`)
+            }
+            else {
+                if (coupon.condition < subtotal) {
+                    discount = (subtotal * coupon.discount) / 100
+                    total = subtotal - discount
+                } else {
+                    requireAmount = coupon.condition - subtotal
+                    throw new Error(`${requireAmount} more require`)
+                }
             }
         }
-        const cartData = { code, subtotal, dicount, total }
+        const cartData = { code, subtotal, discount, total }
         success = true
         res.status(200).send({ code: 200, success: success, message: msg, data: cartData })
     } catch (error) {
@@ -220,6 +238,63 @@ router.post('/user/cart/checkout', auth, async (req, res) => {
         res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
+
+
+
+// order checkout
+router.post('/user/order-checkout', auth, async (req, res) => {
+    const user_id = req.body.user_id
+    const cart_id = req.body.cart_id
+    const subtotal = req.body.subtotal
+    const discount = req.body.discount
+    const total_amount = req.body.total
+    const msg = 'order data'
+    var productData = [], product_details, items = 0, product_price
+    try {
+        console.log('/user/order-checkout');
+        // user details
+        const user = await User.findById(user_id)
+        if (!user) {
+            throw new Error(`User not found`)
+        }
+
+        // products data
+        const cart = await Cart.findById(cart_id)
+        if (!cart) {
+            throw new Error('Cart not found')
+        }
+        for (var i = 0; i < cart.products.length; i++) {
+            product_brand = cart.products[i].product_brand
+            product_name = cart.products[i].product_name
+            product_banner = cart.products[i].product_banner
+            product_price = cart.products[i].amount
+            items += cart.products[i].product_quantity
+            const details = { product_brand, product_name, product_banner, product_price }
+            productData.push(details)
+        }
+
+        // check stock
+        for (var i = 0; i < cart.products.length; i++) {
+            const cart_quantity = cart.products[i].product_quantity
+            const product = await Product.findById(cart.products[i].product_id)
+            const product_livequantity = product.livequantity
+            if (cart_quantity > product_livequantity) {
+                throw new Error(`${product.product_name}: Available Qauntity : ${product_livequantity}`)
+            } if (product_livequantity == 0) {
+                throw new Error(`${product.product_name}: Out Of Stock`)
+            }
+        }
+
+        const orderCheckout = { user_id, cart_id, productData, items, subtotal, discount, total_amount }
+        await Cart.findByIdAndUpdate({ cart_id },{total_amount})
+        success = true
+        res.status(200).send({ code: 200, success: success, message: msg, data: orderCheckout })
+    } catch (error) {
+        success = false
+        res.status(400).send({ code: 400, success: success, message: error.message })
+    }
+})
+
 
 
 module.exports = router

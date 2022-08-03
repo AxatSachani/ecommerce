@@ -13,7 +13,6 @@ const SubItemSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true,
-        uppercase: true
     },
     addedBy: {
         type: ObjectId,
@@ -28,6 +27,18 @@ const SubItemSchema = new mongoose.Schema({
         default: moment(Date.now()).format('DD/MM/YYYY hh:mm a')
     }
 })
+
+
+
+// filter response data
+SubItemSchema.methods.toJSON = function () {
+    const subItem = this
+    const subItemData = subItem.toObject()
+    delete subItemData.addedBy
+    delete subItemData.__v
+    return subItemData
+}
+
 
 const SubItems = mongoose.model('SubItems', SubItemSchema)
 module.exports = SubItems

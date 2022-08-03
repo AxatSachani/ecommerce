@@ -60,6 +60,7 @@ AdminSchema.methods.toJSON = function () {
     const adminData = admin.toObject()
     delete adminData.password
     delete adminData.tokens
+    delete adminData.__v
     return adminData
 }
 

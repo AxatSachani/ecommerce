@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const moment = require('moment')
 
 const UserSchema = new mongoose.Schema({
 
@@ -35,9 +36,25 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    DOB: {
+        type: String
+    },
     address: {
-        type: String,
-        required: true,
+        address: {
+            type: String,
+        },
+        pincode: {
+            type: String,
+        },
+        locality: {
+            type: String,
+        },
+        city: {
+            type: String,
+        },
+        state: {
+            type: String,
+        }
     },
     alterContact_no: {
         type: String
@@ -54,6 +71,10 @@ const UserSchema = new mongoose.Schema({
                 throw new Error(`Password can not end with space (' ') `)
             }
         }
+    },
+    createAt: {
+        type: String,
+        default: moment(Date.now()).format('DD/MM/YYYY hh:mm a')
     },
     tokens: [{
         token: {
@@ -87,20 +108,20 @@ UserSchema.pre('save', async function (next) {
 UserSchema.statics.findByCredentials = async function (emailId, password) {
     const user = await User.findOne({ emailId })
     if (!user) {
-        throw  Error('User not found')
+        throw Error('User not found')
     }
     const isMatch = await bcrypt.compare(password, user.password)
     if (!isMatch) {
-        throw  Error('Invalid Password')
+        throw Error('Invalid Password')
     }
     return user
 }
 
 // generate token
-UserSchema.methods.generateAuthToken = async function(){
+UserSchema.methods.generateAuthToken = async function () {
     const user = this
-    const token = jwt.sign({_id:user._id.toString()},'token')
-    user.tokens = user.tokens.concat({token})
+    const token = jwt.sign({ _id: user._id.toString() }, 'token')
+    user.tokens = user.tokens.concat({ token })
     await user.save()
     return token
 }

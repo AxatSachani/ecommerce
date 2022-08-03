@@ -1,32 +1,56 @@
 const express = require("express");
 const multer = require('multer');
-const Seller = require("../models/Seller");
-const Photo = require("../models/Photo");
+const Seller = require("../../models/Seller");
+const Photo = require("../../models/Photo");
 const router = express.Router()
-const SellerRequest = require('../models/SellerRequest')
-const ForgetPassword = require('../models/ForgetPass');
-const SellerRejected = require("../models/SellerRejected");
-const auth = require("../middleware/Auth");
+const SellerRequest = require('../../models/SellerRequest')
+const ForgetPassword = require('../../models/ForgetPass');
+const SellerRejected = require("../../models/SellerRejected");
+const auth = require("../../middleware/Auth");
+const uuid = require('uuid-v4')
+const bucket = require("../../storage/bucket")
 
 
+
+const storage = multer.diskStorage({
+    destination: `src/image`,
+    filename: function (req, file, cb) {
+        const filename = file.originalname.split('.')
+        for (var i = 0; i < filename[0].length; i++) {
+            if (filename[i] == " ") {
+                throw new Error('invalid name')
+            }
+        }
+        cb(null, `${filename[0]}${Date.now()}.png`)
+    }
+})
 const upload = multer({
+    storage: storage,
     limits: {
         fileSize: 8000000
     },
     fileFilter(req, file, cb) {
-        if (!file.originalname.match(/\.(png|jpeg|jpg|pdf)$/)) {
-            return cb(new Error('InCorrect file format'))
+        if (!file.originalname.match(/\.(png|jpeg|jpg)$/)) {
+            return cb(new Error('incorrect file format'))
         }
         cb(undefined, true)
     }
-}).single('document')
+}).array('document', 10)
 
 
 
 // seller signup (create seller account)
-router.post('/seller/account', async (req, res) => {
+router.post('/seller/account', upload, async (req, res) => {
     const msg = 'new request create for seller account'
+    const first_name = req.body.first_name
+    const last_name = req.body.last_name
+    const store_name = req.body.store_name
+    const address = req.body.address
+    const contact_no = req.body.contact_no
     const emailId = req.body.emailId
+    const password = req.body.password
+    const file = req.files
+    var links = []
     var success
     console.log('seller-req');
     try {
@@ -38,7 +62,28 @@ router.post('/seller/account', async (req, res) => {
         if (rejectSeller) {
             throw new Error(`seller alreddy rejected with reason: ${rejectSeller.reject_reason}`)
         }
-        const sellerRequest = await SellerRequest(req.body)
+        const checkSellerRequest = await SellerRequest.findOne({ emailId })
+        if (checkSellerRequest) {
+            throw new Error(`alreddy requested`)
+        }
+        for (let i = 0; i < file.length; i++) {
+            const metadata = {
+                metadata: {
+                    firebaseStorageDownloadTokens: uuid()
+                },
+                contentType: 'image/png',
+                cacheControl: 'public, max-age=31536000',
+            };
+            bucket.upload(file[i].path, {
+                gzip: true,
+                metadata: metadata,
+            });
+            const link = `https://firebasestorage.googleapis.com/v0/b/ecommerce-3c496.appspot.com/o/${file[i].filename}?alt=media&token=${metadata.metadata.firebaseStorageDownloadTokens}`
+            links.push(link)
+            console.log(`${file[i].filename} uploaded.`);
+        }
+        const data = { first_name, last_name, store_name, address, contact_no, emailId, password, document: links }
+        const sellerRequest = await SellerRequest(data)
         await sellerRequest.save()
         success = true
         res.status(201).send({ code: 201, success: success, message: msg, data: sellerRequest })
@@ -47,7 +92,6 @@ router.post('/seller/account', async (req, res) => {
         res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
-
 
 
 // signin with seller ID
@@ -124,9 +168,6 @@ router.put('/seller/:id', auth, async (req, res) => {
         res.status(400).send({ code: 400, success: success, message: error.message })
     }
 })
-
-
-
 
 
 module.exports = router

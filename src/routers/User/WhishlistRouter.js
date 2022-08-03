@@ -1,10 +1,9 @@
 const express = require("express");
-const Whishlist = require("../models/Whishlist");
-const Product = require("../models/Product");
-const User = require("../models/User");
-const auth = require("../middleware/Auth");
+const Whishlist = require("../../models/Whishlist");
+const Product = require("../../models/Product");
+const User = require("../../models/User");
+const auth = require("../../middleware/Auth");
 const router = express.Router()
-
 
 
 // add to whishlist
@@ -23,10 +22,12 @@ router.post('/add/whishlist', auth, async (req, res) => {
         if (!productDetails) {
             throw new Error('invalid product id')
         }
-        seller_id = productDetails.seller_id
-        product_name = productDetails.product_details.name
-        product_price = productDetails.product_price
-        const whishListDetails = { user_id, products: { product_id, seller_id, product_name, product_price } }
+        const seller_id = productDetails.seller_id
+        const product_brand = productDetails.product_details.name
+        const product_name = productDetails.product_details.description
+        const product_banner = productDetails.product_details.banner
+        const product_price = productDetails.product_price
+        const whishListDetails = { user_id, product_id, seller_id, product_brand, product_name, product_banner, product_price }
         const whishlist = await Whishlist(whishListDetails)
         await whishlist.save()
         success = true
@@ -46,11 +47,10 @@ router.delete('/user/whishlist/delete/:id', auth, async (req, res) => {
     var success
     console.log('whish-del');
     try {
-        const whishlist = await Whishlist.findById(whishlist_id)
+        const whishlist = await Whishlist.findByIdAndDelete(whishlist_id)
         if (!whishlist) {
             throw new Error('invalid whishlist id')
         }
-        await w.delete()
         success = true
         res.status(200).send({ code: 200, success: success, message: msg })
     } catch (error) {
@@ -66,6 +66,7 @@ router.get('/user/whishlist/:id', auth, async (req, res) => {
     var success
     console.log('whish-get');
     try {
+       
         const user = await User.findById(user_id)
         if (!user) {
             throw new Error('user not found')

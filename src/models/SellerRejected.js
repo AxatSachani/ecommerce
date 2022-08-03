@@ -5,51 +5,54 @@ const moment = require('moment');
 const { ObjectId } = require("mongodb");
 
 const SellerRejectedSchema = new mongoose.Schema({
-    _id:{
-        type:ObjectId,
-        required:true
+    _id: {
+        type: ObjectId,
+        required: true
     },
     first_name: {
         type: String,
-        required: true,
-        trim: true
+        required: true
     },
     last_name: {
         type: String,
-        required: true,
-        trim: true
+        required: true
+    },
+    store_name: {
+        type: String
+    },
+    address: {
+        address: {
+            type: String,
+        },
+        pincode: {
+            type: String,
+        },
+        locality: {
+            type: String,
+        },
+        city: {
+            type: String,
+        },
+        state: {
+            type: String,
+        }
+    },
+    document: {
+        type: Array
     },
     emailId: {
         type: String,
-        required: true,
-        trim: true,
-        lowercase: true,
-        unique: true,
-        validate(value) {
-            if (!validator.isEmail(value)) {
-                throw new Error('Invalid Email..')
-            }
-        }
+        required: true
     },
     contact_no: {
         type: Number,
-        required: true,
-        trim: true
+        required: true
     },
     password: {
         type: String,
-        required: true,
-        validate(value) {
-            if (value.length < 6) {
-                throw new Error('password must be contain atleast 6 characters')
-            } else if (value.toLowerCase().includes('password')) {
-                throw new Error(`Password can not contain ${value}`)
-            } else if (value.endsWith(' ')) {
-                throw new Error(`Password can not end with space (' ') `)
-            }
-        }
+        required: true
     },
-    reject_reason: {
+    remark: {
         type: String
     },
     rejectedAt: {
@@ -58,6 +61,16 @@ const SellerRejectedSchema = new mongoose.Schema({
     }
 })
 
+
+
+// filter response data
+SellerRejectedSchema.methods.toJSON = function () {
+    const seller = this
+    const sellerData = seller.toObject()
+    delete sellerData.tokens
+    delete sellerData.__v
+    return sellerData
+}
 
 const SellerRejected = mongoose.model('SellerRejected', SellerRejectedSchema)
 module.exports = SellerRejected

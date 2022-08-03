@@ -15,6 +15,30 @@ const SellerRequestSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+
+    store_name: {
+        type: String
+    },
+    address: {
+        address: {
+            type: String,
+        },
+        pincode: {
+            type: String,
+        },
+        locality: {
+            type: String,
+        },
+        city: {
+            type: String,
+        },
+        state: {
+            type: String,
+        }
+    },
+    document: {
+        type: Array
+    },
     emailId: {
         type: String,
         required: true,
@@ -45,10 +69,18 @@ const SellerRequestSchema = new mongoose.Schema({
             }
         }
     },
-    document: {
-        type: String
-    }
 })
+
+// filter response data
+SellerRequestSchema.methods.toJSON = function () {
+    const seller = this
+    const sellerData = seller.toObject()
+    // delete sellerData.password
+    delete sellerData.tokens
+    delete sellerData.__v
+    return sellerData
+}
+
 
 SellerRequestSchema.pre('save', async function (next) {
     const seller = this
