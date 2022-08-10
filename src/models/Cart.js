@@ -37,6 +37,14 @@ const CartSchema = new mongoose.Schema({
             type: Number
         }
     }],
+    subtotal:{
+        type:Number,
+        default:0
+    },
+    discount:{
+        type:Number,
+        default:0
+    },
     total_amount:{
         type:Number,
         default:0

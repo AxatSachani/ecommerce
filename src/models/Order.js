@@ -73,7 +73,7 @@ const OrderSchema = new mongoose.Schema({
     },
     order_time: {
         type: String,
-        // default:moment(Date.now()).format('DD/MM/YYYY hh:mm A')
+        default:moment(Date.now()).format('DD/MM/YYYY hh:mm A')
     },
     payment: {
         type: String,

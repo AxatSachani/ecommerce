@@ -1,7 +1,6 @@
 {
   "name": "ecommerce",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.1.1",
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./src/server.js"
@@ -37,5 +36,12 @@
     "uuid": "^8.3.2",
     "uuid-v4": "^0.1.0",
     "validator": "^13.7.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/beact-infotech/E-window-Node.git"
   }
 }
+
+

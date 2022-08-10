@@ -44,7 +44,7 @@ router.post('/user/order', auth, async (req, res) => {
     const expiry_year = req.body.expiry_year
 
     const msg = 'Order Placed'
-    var total_amount = 0, user_name, success, product, payment = paymentType, order_time, user_emailId, user_contact, products, OrderDetails
+    var total_amount, user_name, success, product, payment = paymentType, user_emailId, user_contact, products, OrderDetails
     console.log('order-place');
     try {
         const user = await User.findById(user_id)
@@ -60,27 +60,21 @@ router.post('/user/order', auth, async (req, res) => {
             throw new Error('Cart not found')
         }
 
-       const order_time = moment(Date.now()).format('DD/MM/YYYY hh:mm A')
-
         // user data
         user_name = `${user.first_name} ${user.last_name}`
         user_emailId = user.emailId
         user_contact = user.contact_no
         const address = user.address
 
-        // products data
-        for (var i = 0; i < cart.products.length; i++) {
-            total_amount += cart.products[i].amount
-        }
-
+        total_amount = cart.total_amount
         products = cart.products
-        OrderDetails = { user_id, user_name, user_emailId, user_contact, products, total_amount, payment, address, order_time }
+        OrderDetails = { user_id, user_name, user_emailId, user_contact, products, total_amount, payment, address }
 
         // save order
         const order = await Order(OrderDetails)
 
         var order_id = order._id
-        const OrderHistoryDetails = { order_id, user_id, user_name, user_emailId, user_contact, products, total_amount, payment, address, order_time }
+        const OrderHistoryDetails = { order_id, user_id, user_name, user_emailId, user_contact, products, total_amount, payment, address }
         var orderHistory = await OrderHistory(OrderHistoryDetails)
 
 
@@ -239,6 +233,7 @@ router.post('/user/order/invoice/:id', auth, async (req, res) => {
         res.status(404).send({ code: 404, success: success, message: error.message })
     }
 })
+
 
 
 // user order history

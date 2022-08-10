@@ -37,15 +37,12 @@ router.get('/products/', auth, async (req, res) => {
         if (tag) {
             product = await Product.find({ tag }).select({ _id: 1, product_details: 1, product_price: 1 })
         }
-
         if (gender) {
             product = await Product.find({ tag }).where({ item_type: `${gender}` }).select({ _id: 1, product_details: 1, product_price: 1 })
         }
-
         if (type) {
             product = await Product.find({ tag }).where({ subChild_type: `${type}` }).select({ _id: 1, product_details: 1, product_price: 1 })
         }
-
         if (product.length == 0) {
             throw new Error('Product not found')
         }

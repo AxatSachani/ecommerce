@@ -52,7 +52,7 @@ router.post('/sub-child/', auth, async (req, res) => {
     var success, subChilds = []
     console.log('subchild-get');
     try {
-        const subChild = await SubChild.find({ item_type, subItem_type }, { $options: 'i' })
+        const subChild = await SubChild.find({ item_type, subItem_type })
         for (let i = 0; i < subChild.length; i++) {
             subChilds.push(subChild[i].subChild_type)
         }
@@ -74,7 +74,19 @@ router.get('/sub-child/allsub-child', async (req, res) => {
         const subItems = await SubChild.aggregate(
             [
                 {
-                    $group: { _id: { item_type: "$item_type", subItem_type: "$subItem_type" }, group: { $push: { item_type: "$item_type", subItem_type: "$subItem_type", subChild_type: "$subChild_type", createAt: "$createAt" } } }
+                    $group: {
+                        _id: { item_type: "$item_type", subItem_type: "$subItem_type" },
+                        group: {
+                            $push: {
+                                item_type: "$item_type", subItem_type: "$subItem_type", subChild_type: "$subChild_type", createAt: "$createAt"
+                            }
+                        }
+                    }
+                },
+                {
+                    $sort: {
+                        _id: 1
+                    }
                 }
             ]);
         success = true
@@ -113,7 +125,7 @@ router.put('/sub-child/update', auth, async (req, res) => {
 //delete
 router.delete('/sub-child/delete/:itemType/:subType/:childType', auth, async (req, res) => {
     const type = req.params.itemType
-    const item_type =toFormat(type)
+    const item_type = toFormat(type)
     const subItem_type = req.params.subType.toUpperCase()
     const subChild_type = req.params.childType
     const msg = 'delete successfully'

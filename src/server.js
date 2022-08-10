@@ -2,9 +2,10 @@ const express = require('express')
 require('dotenv').config()
 const moment = require('moment')
 const bodyParser = require('body-parser');
-const db = require('./database/database')
+require('./database/database')
 const cron = require('node-cron');
 const chalk = require('chalk')
+
 
 
 // Admin Routers
@@ -46,8 +47,6 @@ app.use(express.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
-var port = process.env.PORT
-const host = process.env.HOST
 
 
 app.use((req, res, next) => {
@@ -102,7 +101,15 @@ app.use(DemoRouter)
 
 
 
+var port = process.env.PORT
+var host = process.env.HOST
+
 const time = moment(Date.now()).format('hh:mm:ss')
-app.listen(port, '192.168.29.2', () => {
-    console.log(chalk.yellow(`server running on `),chalk.magenta(`http://${host}:${port}`),`( last start:`, chalk.yellow(`${time}`),`)` );
+app.listen(port, '0.0.0.0', () => {
+    console.log(chalk.yellow(`server running on `), chalk.magenta(`http://${host}:${port}`), `( last start:`, chalk.yellow(`${time}`), `)`);
+})
+
+//11000000.10101000.11101.10
+app.get('/', async (req, res) => {
+    res.send(`ecommerce server running on  http://${host}:${port}/`)
 })

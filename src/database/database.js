@@ -19,7 +19,7 @@ mongoose.connect(url, {
         throw err.message
     }
     console.log(chalk.blueBright(`${database}`),`database connected`);
-    connectd = true
+    connectd = true  
 
 })
 

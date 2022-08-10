@@ -200,6 +200,7 @@ router.post('/user/cart/checkout', auth, async (req, res) => {
     const user_id = req.body.user_id
     const couponCode = req.body.code
     const msg = 'checkout data'
+    console.log('cart checkout');
     try {
         const checkout = await Cart.findOne({ user_id })
         if (!checkout) {
@@ -210,7 +211,10 @@ router.post('/user/cart/checkout', auth, async (req, res) => {
         }
         total = subtotal
         if (couponCode) {
-            const coupon = await Coupon.findOne({ coupon_code: couponCode })            //.select({ coupon_type: 1, discount: 1, condition: 1 })
+            const coupon = await Coupon.findOne({ coupon_code: couponCode })     //.select({ coupon_type: 1, discount: 1, condition: 1 })
+            if (!coupon) {
+                throw new Error('invalid coupon code')
+            }
             if (coupon.coupon_type == 'Flat Discount') {
                 if (coupon.condition < subtotal) {
                     discount = coupon.discount
@@ -221,8 +225,9 @@ router.post('/user/cart/checkout', auth, async (req, res) => {
                 }
             }
             else {
+                const validDiscount = (coupon.discount).split('%')
                 if (coupon.condition < subtotal) {
-                    discount = (subtotal * coupon.discount) / 100
+                    discount = (subtotal * validDiscount[0]) / 100
                     total = subtotal - discount
                 } else {
                     requireAmount = coupon.condition - subtotal
@@ -230,7 +235,7 @@ router.post('/user/cart/checkout', auth, async (req, res) => {
                 }
             }
         }
-        const cartData = { code, subtotal, discount, total }
+        const cartData = { couponCode, subtotal, discount, total }
         success = true
         res.status(200).send({ code: 200, success: success, message: msg, data: cartData })
     } catch (error) {
@@ -247,22 +252,24 @@ router.post('/user/order-checkout', auth, async (req, res) => {
     const cart_id = req.body.cart_id
     const subtotal = req.body.subtotal
     const discount = req.body.discount
-    const total_amount = req.body.total
+    const total_amount = req.body.total_amount
+
     const msg = 'order data'
-    var productData = [], product_details, items = 0, product_price
+    var productData = [], items = 0, product_price
+    console.log('/user/order-checkout');
     try {
-        console.log('/user/order-checkout');
         // user details
         const user = await User.findById(user_id)
         if (!user) {
             throw new Error(`User not found`)
         }
-
         // products data
         const cart = await Cart.findById(cart_id)
         if (!cart) {
             throw new Error('Cart not found')
         }
+        await Cart.findByIdAndUpdate(cart_id, { subtotal, discount, total_amount })
+
         for (var i = 0; i < cart.products.length; i++) {
             product_brand = cart.products[i].product_brand
             product_name = cart.products[i].product_name
@@ -284,9 +291,10 @@ router.post('/user/order-checkout', auth, async (req, res) => {
                 throw new Error(`${product.product_name}: Out Of Stock`)
             }
         }
-
-        const orderCheckout = { user_id, cart_id, productData, items, subtotal, discount, total_amount }
-        await Cart.findByIdAndUpdate({ cart_id },{total_amount})
+        const sub_total = cart.subtotal
+        const _discount = cart.discount
+        const _total_amount = cart.total_amount
+        const orderCheckout = { user_id, cart_id, productData, items, sub_total, _discount, _total_amount }
         success = true
         res.status(200).send({ code: 200, success: success, message: msg, data: orderCheckout })
     } catch (error) {

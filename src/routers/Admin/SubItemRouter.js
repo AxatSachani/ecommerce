@@ -48,7 +48,7 @@ router.post('/subitem', auth, async (req, res) => {
     var item_type = req.body.item_type
     const msg = 'all subItems'
     const subItems = []
-    console.log('suitem-type');
+    console.log('subitem-type');
     try {
         const subItem = await SubItems.find({ item_type })
         for (var i = 0; i < subItem.length; i++) {
