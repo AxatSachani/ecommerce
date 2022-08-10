@@ -36,12 +36,8 @@
     "uuid": "^8.3.2",
     "uuid-v4": "^0.1.0",
     "validator": "^13.7.0"
-  },
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/beact-infotech/E-window-Node.git"
   }
+  
 }
 
 
