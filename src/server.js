@@ -6,9 +6,7 @@ require('./database/database')
 const cron = require('node-cron');
 const chalk = require('chalk')
 
-
-
-// Admin Routers
+// Admin Routes
 const AdminRoter = require('./routers/Admin/AdminRouter')
 const ItemRouter = require('./routers/Admin/ItemRouter')
 const SubItemRouter = require('./routers/Admin/SubItemRouter')
