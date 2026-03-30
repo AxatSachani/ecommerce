@@ -125,3 +125,6 @@
   payment: 'success',
   __v: 0
 }
+
+# JWT Secret
+# JWT_SECRET=secret-jwt-key-change-in-production
